@@ -38,7 +38,7 @@ Deux ambiances, choisies selon l'heure (ou forcées dans les réglages : auto / 
 | sauge | `#9AAA98` | `#9AAA98` | Remplissages, états « posés » |
 | brume | `#8C8794` | `#8C8794` | Texte discret de nuit (4,9:1 sur encre). Trop pâle le matin (2,9:1), donc variante foncée |
 
-Dérivés pour le texte en mode Aube (AA ≥ 4,5:1 sur papier) : argile texte `#8F5236`, sauge texte `#4F634D`, brume texte `#5F5967`.
+Dérivés pour le texte en mode Aube (AA ≥ 4,5:1 sur papier) : argile texte `#8F5236`, sauge texte `#4F634D`, brume texte `#5F5967`. Argile profonde `#B37656` pour les objets graphiques du matin (bande, bouton principal) : WCAG 1.4.11 demande 3:1 pour les éléments graphiques, l'argile d'origine n'atteint que 2,3:1. L'argile d'origine reste utilisée dans les dégradés décoratifs.
 
 ### Tokens sémantiques
 
@@ -51,7 +51,7 @@ Dérivés pour le texte en mode Aube (AA ≥ 4,5:1 sur papier) : argile texte `#
 | `text` | `#1C1A1F` | `#EFE8DC` | texte principal |
 | `textMuted` | `#5F5967` | `#B3ABB5` | texte secondaire |
 | `textFaint` | `#7A7482` | `#8C8794` | légendes, grands textes discrets (≥ 3:1, jamais pour du corps) |
-| `light` | `#C98B6B` | `#E8B77A` | **la** source lumineuse : bande, CTA, sélection |
+| `light` | `#B37656` | `#E8B77A` | **la** source lumineuse : bande, CTA, sélection (argile profonde le matin : 3,1:1 sur papier pour les objets graphiques, 4,6:1 pour l'encre posée dessus) |
 | `lightText` | `#8F5236` | `#E8B77A` | texte accentué |
 | `lightOn` | `#1C1A1F` | `#1C1A1F` | texte posé sur `light` |
 | `glow` | `#E8B77A` | `#E8B77A` | halo (toujours ambre, opacité variable) |

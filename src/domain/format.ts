@@ -35,6 +35,13 @@ export function formatClock(minuteOfDay: number, hour12: boolean): string {
   return `${h12}:${m}${NBSP}${suffix}`;
 }
 
+/** Compact hour for chart ticks: "22 h" (fr), "22:00" (en 24 h), "10 pm" (12 h). */
+export function formatHourShort(minuteOfDay: number, hour12: boolean, locale: AppLocale): string {
+  const h = Math.floor(normalizeMinuteOfDay(minuteOfDay) / 60);
+  if (hour12) return `${h % 12 === 0 ? 12 : h % 12}${NBSP}${h < 12 ? 'am' : 'pm'}`;
+  return locale === 'fr' ? `${h}${NBSP}h` : `${String(h).padStart(2, '0')}:00`;
+}
+
 /** Formats a "minutes from noon" value as a clock time. */
 export function formatClockFromNoon(fromNoon: number, hour12: boolean): string {
   return formatClock(minuteOfDayFromNoon(Math.round(fromNoon)), hour12);

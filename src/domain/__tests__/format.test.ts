@@ -3,6 +3,7 @@ import {
   formatClockFromNoon,
   formatDateKey,
   formatDuration,
+  formatHourShort,
   formatPercent,
   nightLabel,
 } from '../format';
@@ -24,6 +25,13 @@ describe('format', () => {
     expect(formatClock(0, true)).toBe('12:00 AM');
     expect(formatClock(13 * 60 + 15, true)).toBe('1:15 PM');
     expect(formatClockFromNoon(810, false)).toBe('01:30');
+  });
+
+  it('formats compact hours for chart ticks', () => {
+    expect(formatHourShort(22 * 60, false, 'fr')).toBe('22\u00A0h');
+    expect(formatHourShort(-120, false, 'en')).toBe('22:00');
+    expect(formatHourShort(0, true, 'en')).toBe('12\u00A0am');
+    expect(formatHourShort(14 * 60, true, 'en')).toBe('2\u00A0pm');
   });
 
   it('formats percentages', () => {

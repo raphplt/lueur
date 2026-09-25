@@ -1,0 +1,9 @@
+# Fresh install state. Waits for the first screen (debug builds load JS from Metro).
+appId: app.lueur
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: onboarding
+    timeout: 90000

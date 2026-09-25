@@ -1,0 +1,35 @@
+# The optional questionnaire, answered, ends on the home screen.
+appId: app.lueur
+name: Onboarding
+---
+- runFlow: ../subflows/launch-fresh.yaml
+- tapOn:
+    id: onboarding-next # welcome
+- assertVisible:
+    id: dial-bedtime
+- tapOn:
+    id: dial-bedtime-plus
+- tapOn:
+    id: onboarding-next # hours
+- tapOn:
+    id: bother-noise
+- tapOn:
+    id: bother-thoughts
+- tapOn:
+    id: onboarding-next # bother
+- tapOn:
+    id: goal-appointment
+- tapOn:
+    id: onboarding-next # goal
+- tapOn:
+    id: toggle-morning # turn the reminder off: no permission prompt
+- tapOn:
+    id: onboarding-next # reminder
+- tapOn:
+    id: onboarding-tag-caffeine # untrack caffeine
+- tapOn:
+    id: onboarding-next # tags → home
+- assertVisible:
+    id: home
+- assertVisible:
+    id: log-night

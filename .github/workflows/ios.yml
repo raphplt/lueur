@@ -1,0 +1,53 @@
+name: iOS
+
+# Builds and uploads the iOS app with fastlane on a macOS runner.
+# Needs the App Store Connect secrets (docs/RELEASE.md); runs on version tags or on demand.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: fastlane lane
+        type: choice
+        options: [build, beta, release, metadata]
+        default: beta
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 120
+    env:
+      LANE: ${{ inputs.lane || 'beta' }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8_BASE64 }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      IOS_DIST_CERT_P12: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+      IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+      LUEUR_SUBMIT: ${{ vars.LUEUR_SUBMIT || '0' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - run: npm ci
+      - run: bundle exec fastlane ios "$LANE"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lueur-ios-${{ github.run_number }}
+          path: build/ios/*.ipa
+          if-no-files-found: ignore

@@ -1,0 +1,14 @@
+# "I can't sleep": no clock on screen, leaves quietly.
+appId: app.lueur
+name: Night mode
+---
+- runFlow: ../subflows/fresh-onboarded.yaml
+- openLink: lueur://insomnia
+- assertVisible:
+    id: insomnia
+- assertNotVisible:
+    text: '.*\d{1,2}:\d{2}.*'
+- tapOn:
+    id: insomnia-leave
+- assertVisible:
+    id: home

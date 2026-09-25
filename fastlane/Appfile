@@ -1,0 +1,4 @@
+# Identifiers shared by all lanes. Credentials come from environment variables,
+# never from this file (see docs/RELEASE.md).
+app_identifier('app.lueur')
+package_name('app.lueur')

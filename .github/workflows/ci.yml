@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, lint, tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --ci --coverage
+      - name: No network code in the app
+        run: |
+          # Lueur makes no network request: fail if one sneaks into the sources.
+          if grep -rnE "\bfetch\(|XMLHttpRequest|WebSocket\(|axios" src --include=*.ts --include=*.tsx; then
+            echo "Network API found in src/" && exit 1
+          fi

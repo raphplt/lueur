@@ -1,0 +1,9 @@
+# Loads the demo diary (demo and development builds only).
+appId: app.lueur
+---
+- runFlow: launch-fresh.yaml
+- openLink: lueur://demo?theme=${THEME || 'dawn'}&lang=${LANG || 'fr'}
+- extendedWaitUntil:
+    visible:
+      id: difficult-card
+    timeout: 20000

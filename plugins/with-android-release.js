@@ -8,8 +8,9 @@
  *    Without them the release build falls back to the debug key (local testing only).
  * 2. Removes the INTERNET permission from the release manifest only: debug
  *    builds still need it to reach the Metro bundler.
+ * 3. Ships the ABIs real devices use (no 32-bit x86): smaller AAB, faster builds.
  */
-const { withAppBuildGradle, withDangerousMod } = require('expo/config-plugins');
+const { withAppBuildGradle, withDangerousMod, withGradleProperties } = require('expo/config-plugins');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -60,6 +61,18 @@ function withReleaseManifest(config) {
   ]);
 }
 
+const ABIS = 'armeabi-v7a,arm64-v8a,x86_64';
+
+function withAbis(config) {
+  return withGradleProperties(config, (cfg) => {
+    cfg.modResults = cfg.modResults.filter(
+      (item) => !(item.type === 'property' && item.key === 'reactNativeArchitectures'),
+    );
+    cfg.modResults.push({ type: 'property', key: 'reactNativeArchitectures', value: ABIS });
+    return cfg;
+  });
+}
+
 module.exports = function withAndroidRelease(config) {
-  return withReleaseManifest(withReleaseSigning(config));
+  return withAbis(withReleaseManifest(withReleaseSigning(config)));
 };

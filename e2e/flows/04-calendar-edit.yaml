@@ -1,0 +1,31 @@
+# Calendar weave → edit a past night → back to the calendar.
+appId: app.lueur
+name: Edit a night from the calendar
+---
+- runFlow: ../subflows/demo.yaml
+- tapOn:
+    id: tab-nights
+- assertVisible:
+    id: nights
+- tapOn:
+    id: month-prev
+- tapOn:
+    id: month-next
+- scrollUntilVisible:
+    element:
+      id: 'weave-.*'
+- tapOn:
+    id: 'weave-.*'
+    index: 2
+- assertVisible:
+    id: band-editor
+- tapOn:
+    id: quality-5
+- tapOn:
+    id: entry-save
+- assertVisible:
+    id: nights
+- tapOn:
+    id: tab-patterns
+- assertVisible:
+    id: correlations

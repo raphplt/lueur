@@ -1,0 +1,25 @@
+# Data: JSON backup goes to the system share sheet; erase needs a confirmation.
+appId: app.lueur
+name: Export and erase
+---
+- runFlow: ../subflows/demo.yaml
+- tapOn:
+    id: tab-settings
+- scrollUntilVisible:
+    element:
+      id: open-data
+- tapOn:
+    id: open-data
+- tapOn:
+    id: export-json
+- assertVisible:
+    text: '.*lueur-.*\.json.*'
+- back
+- tapOn:
+    id: wipe
+- assertVisible:
+    id: confirm-wipe
+- tapOn:
+    id: confirm-wipe
+- assertVisible:
+    id: onboarding

@@ -1,0 +1,32 @@
+# The morning entry: prefilled, one feeling, one tag, saved in a few taps.
+appId: app.lueur
+name: Log a night
+---
+- runFlow: ../subflows/fresh-onboarded.yaml
+- tapOn:
+    id: log-night
+- assertVisible:
+    id: band-editor
+- assertVisible:
+    id: entry-issue # save needs a feeling first
+- tapOn:
+    id: add-awakening
+- assertVisible:
+    id: awakening-editor
+- tapOn:
+    id: awakening-30
+- tapOn:
+    id: quality-2
+- scrollUntilVisible:
+    element:
+      id: tag-noise
+- tapOn:
+    id: tag-noise
+- tapOn:
+    id: entry-save
+- assertVisible:
+    id: last-night
+- assertVisible:
+    id: context-phrase
+- assertVisible:
+    id: difficult-card

@@ -1,0 +1,8 @@
+# Fresh install, questionnaire skipped: lands on an empty home.
+appId: app.lueur
+---
+- runFlow: launch-fresh.yaml
+- tapOn:
+    id: onboarding-skip
+- assertVisible:
+    id: home

@@ -1,0 +1,86 @@
+# Store screenshots. Run with a demo build (EXPO_PUBLIC_DEMO=1):
+#   maestro test -e LANG=fr e2e/screenshots/capture.yaml
+# Raw captures land in e2e/screenshots/raw/<LANG>/, framed by scripts/frame-screenshots.py.
+appId: app.lueur
+name: Store screenshots
+env:
+  LANG: fr
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: onboarding
+    timeout: 90000
+
+# 1. Home, morning ambiance
+- openLink: lueur://demo?theme=dawn&lang=${LANG}
+- extendedWaitUntil:
+    visible:
+      id: difficult-card
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: e2e/screenshots/raw/${LANG}/01-home
+
+# 2. Morning entry on the band
+- tapOn:
+    id: log-night
+- tapOn:
+    id: quality-4
+- tapOn:
+    id: add-awakening
+- tapOn:
+    id: awakening-15
+- waitForAnimationToEnd
+- takeScreenshot: e2e/screenshots/raw/${LANG}/02-entry
+- tapOn:
+    id: header-back
+
+# 3. Calendar weave, night ambiance
+- openLink: lueur://demo?theme=ink&lang=${LANG}
+- extendedWaitUntil:
+    visible:
+      id: difficult-card
+    timeout: 20000
+- tapOn:
+    id: tab-nights
+- waitForAnimationToEnd
+- takeScreenshot: e2e/screenshots/raw/${LANG}/03-weave
+
+# 4. Patterns: what comes with difficult nights
+- openLink: lueur://demo?theme=dawn&lang=${LANG}
+- extendedWaitUntil:
+    visible:
+      id: difficult-card
+    timeout: 20000
+- tapOn:
+    id: tab-patterns
+- scrollUntilVisible:
+    element:
+      id: correlations
+    centerElement: true
+- waitForAnimationToEnd
+- takeScreenshot: e2e/screenshots/raw/${LANG}/04-patterns
+
+# 5. "I can't sleep"
+- openLink: lueur://insomnia
+- extendedWaitUntil:
+    visible:
+      id: insomnia
+    timeout: 10000
+- swipe:
+    direction: DOWN
+    duration: 3500
+- takeScreenshot: e2e/screenshots/raw/${LANG}/05-night
+- tapOn:
+    id: insomnia-leave
+
+# 6. Privacy, night ambiance
+- openLink: lueur://demo?theme=ink&lang=${LANG}
+- extendedWaitUntil:
+    visible:
+      id: difficult-card
+    timeout: 20000
+- openLink: lueur://about
+- waitForAnimationToEnd
+- takeScreenshot: e2e/screenshots/raw/${LANG}/06-privacy

@@ -64,7 +64,13 @@
     "test": "jest",
     "check": "npm run typecheck && npm run lint && npm test",
     "db:generate": "drizzle-kit generate",
-    "prebuild": "expo prebuild --clean"
+    "prebuild": "expo prebuild --clean",
+    "e2e": "maestro test e2e/flows",
+    "build:android": "bundle exec fastlane android build",
+    "build:ios": "bundle exec fastlane ios build",
+    "build:demo:android": "EXPO_PUBLIC_DEMO=1 expo prebuild --platform android --no-install && cd android && EXPO_PUBLIC_DEMO=1 ./gradlew app:assembleRelease -PreactNativeArchitectures=x86_64",
+    "screenshots:android": "maestro test -e LANG=fr e2e/screenshots/capture.yaml && maestro test -e LANG=en e2e/screenshots/capture.yaml && python3 scripts/frame-screenshots.py",
+    "brand": "python3 scripts/brand.py"
   },
   "private": true,
   "allowScripts": {

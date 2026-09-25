@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { getCalendars } from 'expo-localization';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -22,6 +23,9 @@ import { useSettings } from '@/store/settings';
 
 import { timing } from './motion';
 import { colors, motion, type ColorTokens } from './tokens';
+
+/** Demo builds (store screenshots) hide the status bar to stay platform-neutral. */
+const SCREENSHOT_MODE = Constants.expoConfig?.extra?.demo === true;
 
 export interface Theme {
   ambiance: Ambiance;
@@ -108,7 +112,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeContext.Provider value={theme}>
       <PrefsContext.Provider value={prefs}>
-        <StatusBar style={c.statusBar} />
+        <StatusBar style={c.statusBar} hidden={SCREENSHOT_MODE} />
         <View style={[styles.root, { backgroundColor: c.bg }]}>
           {children}
           <DuskVeil ambiance={ambiance} />

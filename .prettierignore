@@ -1,0 +1,8 @@
+android
+ios
+coverage
+node_modules
+src/db/migrations
+vendor
+fastlane/metadata
+*.md

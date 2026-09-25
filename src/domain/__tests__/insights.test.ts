@@ -38,6 +38,24 @@ describe('tagCorrelations', () => {
     expect(noise.latencyDeltaMin).toBe(35);
     expect(noise.difficultRateTagged).toBe(1);
     expect(noise.difficultRateUntagged).toBe(0);
+    expect(noise.helpful).toBe(false);
+  });
+
+  it('recognises what goes with better nights', () => {
+    const nightsWithExercise = Array.from({ length: 16 }, (_, i) => {
+      const sport = i % 2 === 0;
+      return night({
+        date: addDays(today, -i),
+        wake: sport ? '07:30' : '07:00',
+        quality: sport ? 5 : 3,
+        tags: sport ? ['exercise'] : [],
+      });
+    });
+    const [c] = tagCorrelations(nightsWithExercise, ['exercise']);
+    expect(c!.helpful).toBe(true);
+    expect(c!.sleepDeltaMin).toBe(30);
+    expect(c!.restfulRateTagged).toBe(1);
+    expect(c!.restfulRateUntagged).toBe(0);
   });
 
   it('ignores tags with too few nights', () => {

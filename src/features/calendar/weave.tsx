@@ -11,6 +11,7 @@ import type { DateKey, Night } from '@/domain/types';
 import { BandShape } from '@/features/band/band-shape';
 import { bandGeometry, bandInputFromNight, minuteToX, WEAVE_AXIS } from '@/features/band/geometry';
 import { describeNight } from '@/features/insights/describe';
+import { useToneColors } from '@/features/home/nights-card';
 import { Txt } from '@/ui/text';
 import { usePrefs, useTheme } from '@/ui/theme';
 import { space } from '@/ui/tokens';
@@ -40,6 +41,7 @@ export function Weave({
   const { c } = useTheme();
   const { locale, hour12 } = usePrefs();
   const { t } = useTranslation();
+  const toneColors = useToneColors();
   const [width, setWidth] = useState(0);
   const row = compact ? 22 : ROW;
   const band = compact ? 8 : BAND;
@@ -124,7 +126,7 @@ export function Weave({
         )}
         {dates.map((d, i) => {
           const n = nights.get(d);
-          const difficult = n ? nightMetrics(n).isDifficult : false;
+          const tone = n ? nightMetrics(n).tone : null;
           const label = formatDateKey(d, 'EEEEE d', locale);
           const a11yDate = formatDateKey(d, 'EEEE d MMMM', locale);
           return (
@@ -139,7 +141,7 @@ export function Weave({
                 n
                   ? t('calendar.rowA11y', {
                       date: a11yDate,
-                      summary: `${describeNight(n, t, locale, hour12)}${difficult ? `, ${t('calendar.difficultMark')}` : ''}`,
+                      summary: `${describeNight(n, t, locale, hour12)}${tone ? `, ${t(`calendar.tone.${tone}`)}` : ''}`,
                     })
                   : t('calendar.rowMissingA11y', { date: a11yDate })
               }
@@ -157,7 +159,7 @@ export function Weave({
               >
                 {label}
               </Txt>
-              {difficult && <View style={[styles.mark, { backgroundColor: c.light }]} />}
+              {tone && <View style={[styles.mark, { backgroundColor: toneColors[tone] }]} />}
             </Pressable>
           );
         })}

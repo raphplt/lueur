@@ -6,13 +6,18 @@ import { useTranslation } from 'react-i18next';
 import { LogoMark } from '@/brand/logo';
 import { bandInputFromNight } from '@/features/band/geometry';
 import { NightBand } from '@/features/band/night-band';
-import { DifficultCard, type DayState } from '@/features/home/difficult-card';
-import { describeDrift, describeNight, describeWeekendGap } from '@/features/insights/describe';
+import { NightsCard, type DayState } from '@/features/home/nights-card';
+import {
+  describeCorrelation,
+  describeDrift,
+  describeNight,
+  describeWeekendGap,
+} from '@/features/insights/describe';
 import { useToday } from '@/hooks/use-today';
 import { isNightTime } from '@/domain/ambiance';
 import { formatDateKey, formatDuration, formatPercent } from '@/domain/format';
-import { bedtimeDrift, contextPhrase, weekendGap } from '@/domain/insights';
-import { difficultFrequency, nightMetrics } from '@/domain/metrics';
+import { bedtimeDrift, contextPhrase, tagCorrelations, weekendGap } from '@/domain/insights';
+import { difficultFrequency, nightMetrics, nightsBetween } from '@/domain/metrics';
 import { addDays, dateRange } from '@/domain/time';
 import { useData } from '@/store/data';
 import { useSettings } from '@/store/settings';
@@ -33,6 +38,7 @@ export default function Home() {
   const { minuteOfDay, c } = useTheme();
   const today = useToday();
   const nights = useData((s) => s.nights);
+  const tags = useData((s) => s.tags);
   const goal = useSettings((s) => s.settings.goal);
 
   const byDate = new Map(nights.map((n) => [n.wakeDate, n]));
@@ -42,7 +48,7 @@ export default function Home() {
   const freq = difficultFrequency(nights, today);
   const dayStates: DayState[] = dateRange(freq.current.from, freq.current.to).map((d) => {
     const n = byDate.get(d);
-    return !n ? 'missing' : nightMetrics(n).isDifficult ? 'difficult' : 'logged';
+    return n ? nightMetrics(n).tone : 'missing';
   });
   // Only nights since the user started logging count as missing: no guilt on day one.
   const firstLogged = nights[0]?.wakeDate;
@@ -52,13 +58,23 @@ export default function Home() {
         .reverse()
     : [];
   const phrase = tonight ? contextPhrase(tonight, nights) : null;
+  // What seems to help comes first; drift and weekend gap otherwise.
+  const helps = tagCorrelations(
+    nightsBetween(nights, addDays(today, -89), today),
+    tags.map((x) => x.id),
+  ).find((c) => c.helpful);
   const drift = bedtimeDrift(nights, today);
   const gap = weekendGap(nights, today);
-  const insight = drift
-    ? describeDrift(drift, t, locale)
-    : gap?.notable
-      ? describeWeekendGap(gap, t, locale)
-      : null;
+  const insight = helps
+    ? {
+        title: t('home.helpsTitle'),
+        text: describeCorrelation(helps, tags, t, locale).main,
+      }
+    : drift
+      ? { title: t('home.insightTitle'), text: describeDrift(drift, t, locale) }
+      : gap?.notable
+        ? { title: t('home.insightTitle'), text: describeWeekendGap(gap, t, locale) }
+        : null;
 
   const logButton = (
     <Button
@@ -144,16 +160,16 @@ export default function Home() {
       )}
 
       <View style={styles.block}>
-        <DifficultCard freq={freq} days={dayStates} />
+        <NightsCard freq={freq} days={dayStates} />
       </View>
 
       {insight && (
         <Surface style={styles.block}>
           <Txt v="label" tone="textMuted">
-            {t('home.insightTitle')}
+            {insight.title}
           </Txt>
-          <Txt v="body" style={styles.phrase}>
-            {insight}
+          <Txt v="body" style={styles.phrase} testID="home-insight">
+            {insight.text}
           </Txt>
           <Button
             variant="quiet"

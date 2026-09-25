@@ -8,6 +8,13 @@ export const DIFFICULT_QUALITY_MAX = 2;
 
 export type DifficultReason = 'quality' | 'latency' | 'waso';
 
+/**
+ * Overall tone of a night, for a balanced view: difficult (the sleep-diary
+ * thresholds), restful (felt good or restful, without difficulty), or mixed.
+ */
+export type NightTone = 'restful' | 'mixed' | 'difficult';
+export const RESTFUL_QUALITY_MIN = 4;
+
 export interface NightMetrics {
   timeInBedMin: number;
   latencyMin: number;
@@ -24,6 +31,7 @@ export interface NightMetrics {
   midSleepClock: number;
   difficultReasons: DifficultReason[];
   isDifficult: boolean;
+  tone: NightTone;
 }
 
 export function nightMetrics(night: Night): NightMetrics {
@@ -64,6 +72,12 @@ export function nightMetrics(night: Night): NightMetrics {
     midSleepClock,
     difficultReasons,
     isDifficult: difficultReasons.length > 0,
+    tone:
+      difficultReasons.length > 0
+        ? 'difficult'
+        : night.quality >= RESTFUL_QUALITY_MIN
+          ? 'restful'
+          : 'mixed',
   };
 }
 
@@ -97,6 +111,8 @@ export interface Summary {
   /** Standard deviation of out-of-bed times (minutes). Needs ≥ 3 nights. */
   riseSpreadMin: number | null;
   difficult: number;
+  restful: number;
+  mixed: number;
 }
 
 export const MIN_NIGHTS_FOR_REGULARITY = 3;
@@ -119,7 +135,9 @@ export function summarize(nights: Night[]): Summary {
     outOfBedClock: pick((m) => m.outOfBedClock),
     bedtimeSpreadMin: spread((m) => m.bedClock),
     riseSpreadMin: spread((m) => m.outOfBedClock),
-    difficult: ms.filter((m) => m.isDifficult).length,
+    difficult: ms.filter((m) => m.tone === 'difficult').length,
+    restful: ms.filter((m) => m.tone === 'restful').length,
+    mixed: ms.filter((m) => m.tone === 'mixed').length,
   };
 }
 
@@ -134,6 +152,8 @@ export interface DifficultWindow {
   days: number;
   logged: number;
   difficult: number;
+  restful: number;
+  mixed: number;
 }
 
 export interface DifficultFrequency {
@@ -148,16 +168,42 @@ export interface DifficultFrequency {
 export function difficultFrequency(nights: Night[], today: DateKey, days = 30): DifficultFrequency {
   const window = (to: DateKey): DifficultWindow => {
     const from = addDays(to, -(days - 1));
-    const inside = nightsBetween(nights, from, to);
+    const tones = nightsBetween(nights, from, to).map((n) => nightMetrics(n).tone);
     return {
       from,
       to,
       days,
-      logged: inside.length,
-      difficult: inside.filter((n) => nightMetrics(n).isDifficult).length,
+      logged: tones.length,
+      difficult: tones.filter((t) => t === 'difficult').length,
+      restful: tones.filter((t) => t === 'restful').length,
+      mixed: tones.filter((t) => t === 'mixed').length,
     };
   };
   const current = window(today);
   const previous = window(addDays(current.from, -1));
   return { current, previous };
+}
+
+export type ToneTrend =
+  'moreRestful' | 'fewerDifficult' | 'steady' | 'fewerRestful' | 'moreDifficult';
+
+/** Nights needed in each window before a trend is worth stating. */
+export const MIN_NIGHTS_FOR_TREND = 7;
+/** Change in share (0…1) below which the month is called steady. */
+export const TREND_SHARE_DELTA = 0.1;
+
+/**
+ * Direction of the last window compared with the one before, stated from the
+ * positive side first. Null when either window has too few nights.
+ */
+export function toneTrend(freq: DifficultFrequency): ToneTrend | null {
+  const { current: c, previous: p } = freq;
+  if (c.logged < MIN_NIGHTS_FOR_TREND || p.logged < MIN_NIGHTS_FOR_TREND) return null;
+  const restful = c.restful / c.logged - p.restful / p.logged;
+  const difficult = c.difficult / c.logged - p.difficult / p.logged;
+  if (restful >= TREND_SHARE_DELTA) return 'moreRestful';
+  if (difficult <= -TREND_SHARE_DELTA) return 'fewerDifficult';
+  if (difficult >= TREND_SHARE_DELTA) return 'moreDifficult';
+  if (restful <= -TREND_SHARE_DELTA) return 'fewerRestful';
+  return 'steady';
 }

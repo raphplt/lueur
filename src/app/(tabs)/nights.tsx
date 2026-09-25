@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { formatDateKey } from '@/domain/format';
-import { nightMetrics, nightsBetween } from '@/domain/metrics';
+import { nightsBetween, summarize } from '@/domain/metrics';
 import { addMonths, dateRange, endOfMonth, startOfMonth } from '@/domain/time';
 import { Weave } from '@/features/calendar/weave';
 import { useToday } from '@/hooks/use-today';
@@ -27,7 +27,7 @@ export default function Nights() {
   const last = endOfMonth(month) < today ? endOfMonth(month) : today;
   const dates = month <= today ? dateRange(month, last) : [];
   const inMonth = nightsBetween(nights, month, last);
-  const difficult = inMonth.filter((n) => nightMetrics(n).isDifficult).length;
+  const month_ = summarize(inMonth);
   const title = formatDateKey(month, 'LLLL yyyy', locale);
   const canNext = addMonths(month, 1) <= today;
 
@@ -61,8 +61,10 @@ export default function Nights() {
         {inMonth.length === 0
           ? t('calendar.empty')
           : t('calendar.monthSummary', {
-              count: difficult,
               nights: t('common.nightsLogged', { count: inMonth.length }),
+              restful: month_.restful,
+              mixed: month_.mixed,
+              difficult: month_.difficult,
             })}
       </Txt>
 

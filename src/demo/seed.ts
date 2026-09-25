@@ -62,9 +62,12 @@ export function demoData(today: DateKey, zone: Zone, days = 60, seed = 7): Expor
     // Bedtime drifts ~10 min later per week over the period.
     const drift = ((days - i) / 7) * 10;
     const bed = round5(-60 + drift + (weekend ? 70 : 0) + (rnd() - 0.5) * 50 + (screen ? 20 : 0));
-    const latency = round5(10 + rnd() * 15 + (thoughts ? 25 : 0) + (noise ? 10 : 0));
+    const exercise = rnd() < 0.3;
+    const latency = round5(
+      8 + rnd() * 12 + (thoughts ? 14 : 0) + (noise ? 10 : 0) - (exercise ? 5 : 0),
+    );
     // Wake-up follows the drift in part, so nights shift rather than shrink.
-    const rise = round5((weekend ? 540 : 420) + drift + (rnd() - 0.5) * 30);
+    const rise = round5((weekend ? 540 : 420) + drift + (exercise ? 20 : 0) + (rnd() - 0.5) * 30);
     const awakenings: NightDraft['awakenings'] = [];
     const count = (noise ? 2 : 0) + (insect ? 1 : 0) + (rnd() < 0.3 ? 1 : 0);
     for (let k = 0; k < count; k++) {
@@ -90,7 +93,7 @@ export function demoData(today: DateKey, zone: Zone, days = 60, seed = 7): Expor
       thoughts && 'tag-thoughts',
       screen && 'tag-lateScreen',
       rnd() < 0.2 && 'tag-caffeine',
-      rnd() < 0.15 && 'tag-exercise',
+      exercise && 'tag-exercise',
       thoughts && rnd() < 0.5 && 'tag-clockWatching',
     ].filter((x): x is string => typeof x === 'string');
     const draft: NightDraft = {

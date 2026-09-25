@@ -149,8 +149,13 @@ export default function Patterns() {
                 detail={t('reports.stats.efficiencyHint')}
               />
               <Stat
-                label={t('reports.frequency.title')}
-                value={t('reports.frequency.value', { difficult: s.difficult, logged: s.nights })}
+                label={t('reports.tones.title')}
+                value={t('reports.tones.value', {
+                  restful: s.restful,
+                  mixed: s.mixed,
+                  difficult: s.difficult,
+                })}
+                detail={t('reports.tones.detail')}
               />
             </View>
             <Divider />
@@ -221,17 +226,35 @@ export default function Patterns() {
           </Txt>
         ) : (
           <View style={styles.list}>
-            {correlations.map((corr) => {
-              const text = describeCorrelation(corr, tags, t, locale);
-              return (
-                <View key={corr.tagId} style={styles.item} accessible>
-                  <Txt v="body">{text.main}</Txt>
-                  <Txt v="caption" tone="textMuted">
-                    {text.detail}
+            {(
+              [
+                ['helps', correlations.filter((x) => x.helpful)],
+                ['weighs', correlations.filter((x) => !x.helpful)],
+              ] as const
+            ).map(([group, list]) =>
+              list.length === 0 ? null : (
+                <View key={group} style={styles.list} testID={`correlations-${group}`}>
+                  <Txt v="label" tone={group === 'helps' ? 'lightText' : 'textMuted'}>
+                    {t(
+                      group === 'helps'
+                        ? 'reports.correlations.helpsTitle'
+                        : 'reports.correlations.weighsTitle',
+                    )}
                   </Txt>
+                  {list.map((corr) => {
+                    const text = describeCorrelation(corr, tags, t, locale);
+                    return (
+                      <View key={corr.tagId} style={styles.item} accessible>
+                        <Txt v="body">{text.main}</Txt>
+                        <Txt v="caption" tone="textMuted">
+                          {text.detail}
+                        </Txt>
+                      </View>
+                    );
+                  })}
                 </View>
-              );
-            })}
+              ),
+            )}
             <Txt v="caption" tone="textFaint">
               {t('reports.correlations.caveat')}
             </Txt>

@@ -109,25 +109,36 @@ const en: Strings = {
     lastNight: 'Last night',
     cantSleep: 'I can’t sleep',
     cantSleepHint: 'Very dark screen, no clock',
-    difficult: {
-      title: 'Difficult nights',
-      count_zero: 'No difficult nights in the last {{days}} days.',
-      count_one: '{{count}} difficult night in the last {{days}} days.',
-      count_other: '{{count}} difficult nights in the last {{days}} days.',
-      logged: 'Out of {{logged}} logged.',
-      previous_zero: 'The month before: none.',
-      previous_one: 'The month before: {{count}}.',
-      previous_other: 'The month before: {{count}}.',
-      previousNone: 'No nights logged the month before.',
-      empty: 'Logged nights will show up here. Frequency becomes readable after a few weeks.',
+    nights: {
+      title: 'Your last {{days}} nights',
+      restful_one: 'restful',
+      restful_other: 'restful',
+      mixed_one: 'so-so',
+      mixed_other: 'so-so',
+      difficult_one: 'difficult',
+      difficult_other: 'difficult',
+      logged: 'Out of {{logged}} nights logged.',
+      a11y: '{{restful}} restful, {{mixed}} so-so, {{difficult}} difficult, out of {{logged}} nights logged.',
+      empty: 'Your nights will show up here. The trend becomes readable after a few weeks.',
+      trend: {
+        moreRestful: 'More restful nights than the month before ({{now}} vs {{before}}).',
+        fewerDifficult: 'Fewer difficult nights than the month before ({{now}} vs {{before}}).',
+        steady: 'A month much like the one before.',
+        fewerRestful:
+          'Slightly fewer restful nights than the month before ({{now}} vs {{before}}).',
+        moreDifficult:
+          'Slightly more difficult nights than the month before ({{now}} vs {{before}}).',
+        none: 'The comparison with the month before will come with a few more nights.',
+      },
       how: 'How this is counted',
       howBody:
-        'A night counts as difficult if it felt rough or very rough, if it took more than 30 minutes to fall asleep, or if you were awake for more than 30 minutes in total during the night. These are the usual sleep-diary thresholds. It is not a diagnosis.',
+        'Restful: felt fairly good or restful. Difficult: felt rough, or more than 30 minutes to fall asleep, or more than 30 minutes awake in total during the night (the usual sleep-diary thresholds). So-so: everything else. It is not a diagnosis.',
     },
     missing_one: '{{count}} night not logged recently',
     missing_other: '{{count}} nights not logged recently',
     catchUp: 'Catch up',
     insightTitle: 'Worth noticing',
+    helpsTitle: 'What seems to help',
     seeTrends: 'See patterns',
   },
   phrases: {
@@ -222,16 +233,14 @@ const en: Strings = {
     previousMonth: 'Previous month',
     nextMonth: 'Next month',
     legend:
-      'One line per night, from 6 pm to 2 pm. The brighter the glow, the more restful the night felt. Dark gaps are awakenings.',
+      'One line per night, from 6 pm to 2 pm. The brighter the glow, the more restful the night felt. Dark gaps are awakenings. The dot on the left gives the tone: bright for a restful night, green for so-so, pale for difficult.',
     notLogged: 'Not logged',
     addNight: 'Log this night',
     rowA11y: '{{date}}: {{summary}}',
     rowMissingA11y: '{{date}}: not logged',
-    difficultMark: 'difficult',
+    tone: { restful: 'restful', mixed: 'so-so', difficult: 'difficult' },
     empty: 'No nights logged this month.',
-    monthSummary_zero: '{{nights}}, none difficult.',
-    monthSummary_one: '{{nights}}, {{count}} difficult.',
-    monthSummary_other: '{{nights}}, {{count}} difficult.',
+    monthSummary: '{{nights}}: {{restful}} restful, {{mixed}} so-so, {{difficult}} difficult.',
   },
   reports: {
     rhythm: 'Rhythm',
@@ -260,6 +269,11 @@ const en: Strings = {
       average: 'on average',
       quality: 'Average feeling',
     },
+    tones: {
+      title: 'Breakdown',
+      value: '{{restful}} · {{mixed}} · {{difficult}}',
+      detail: 'restful · so-so · difficult',
+    },
     frequency: {
       title: 'Difficult nights',
       value: '{{difficult}} of {{logged}}',
@@ -271,6 +285,16 @@ const en: Strings = {
       more: 'Nights marked “{{tag}}”: {{duration}} more sleep on average ({{count}} nights).',
       difficultRate: 'Difficult nights: {{tagged}} with it, {{untagged}} without.',
       latency: 'Falling asleep takes {{duration}} longer on average.',
+      helpsTitle: 'What seems to help',
+      weighsTitle: 'What seems to weigh',
+      restfulMore:
+        'Nights marked “{{tag}}” are more often restful: {{tagged}} vs {{untagged}} ({{count}} nights).',
+      difficultMore:
+        'Nights marked “{{tag}}” are more often difficult: {{tagged}} vs {{untagged}} ({{count}} nights).',
+      restfulLess:
+        'Nights marked “{{tag}}” are less often restful: {{tagged}} vs {{untagged}} ({{count}} nights).',
+      difficultLess:
+        'Nights marked “{{tag}}” are less often difficult: {{tagged}} vs {{untagged}} ({{count}} nights).',
       notEnough:
         'Links appear once a marker has at least 5 nights with it and 5 without. Keep logging, no pressure.',
     },

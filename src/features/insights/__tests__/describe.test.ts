@@ -26,6 +26,9 @@ describe('insight wording', () => {
       latencyDeltaMin: 15,
       difficultRateTagged: 0.67,
       difficultRateUntagged: 0.2,
+      restfulRateTagged: 0.1,
+      restfulRateUntagged: 0.4,
+      helpful: false,
     };
     expect(describeCorrelation(c, tags, fr, 'fr').main).toBe(
       'Les nuits marquées « Bruit » : 48 min de sommeil en moins en moyenne (9 nuits).',
@@ -36,6 +39,41 @@ describe('insight wording', () => {
     expect(
       describeCorrelation({ ...c, sleepDeltaMin: 20, latencyDeltaMin: 0 }, tags, en, 'en').main,
     ).toContain('more sleep');
+  });
+
+  it('speaks of restful or difficult nights when sleep time barely differs', () => {
+    const c = {
+      tagId: 't1',
+      taggedNights: 8,
+      untaggedNights: 20,
+      sleepDeltaMin: 5,
+      latencyDeltaMin: 0,
+      difficultRateTagged: 0.1,
+      difficultRateUntagged: 0.3,
+      restfulRateTagged: 0.75,
+      restfulRateUntagged: 0.35,
+      helpful: true,
+    };
+    expect(describeCorrelation(c, tags, fr, 'fr').main).toBe(
+      'Les nuits marquées « Bruit » sont plus souvent reposantes : 75\u202F% contre 35\u202F% (8 nuits).',
+    );
+    // The sentence follows the rate that moved most, in its real direction.
+    expect(
+      describeCorrelation(
+        { ...c, restfulRateTagged: 0.3, restfulRateUntagged: 0.35 },
+        tags,
+        en,
+        'en',
+      ).main,
+    ).toBe('Nights marked “Noise” are less often difficult: 10% vs 30% (8 nights).');
+    expect(
+      describeCorrelation(
+        { ...c, helpful: false, restfulRateTagged: 0.2, restfulRateUntagged: 0.5 },
+        tags,
+        en,
+        'en',
+      ).main,
+    ).toBe('Nights marked “Noise” are less often restful: 20% vs 50% (8 nights).');
   });
 
   it('labels built-in and personal tags', () => {

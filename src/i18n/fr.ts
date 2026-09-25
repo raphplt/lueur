@@ -110,26 +110,38 @@ const fr = {
     lastNight: 'Cette nuit',
     cantSleep: 'Je n’arrive pas à dormir',
     cantSleepHint: 'Écran très sombre, sans heure',
-    difficult: {
-      title: 'Nuits difficiles',
-      count_zero: 'Aucune nuit difficile sur les {{days}} derniers jours.',
-      count_one: '{{count}} nuit difficile sur les {{days}} derniers jours.',
-      count_other: '{{count}} nuits difficiles sur les {{days}} derniers jours.',
-      logged: 'Sur {{logged}} notées.',
-      previous_zero: 'Le mois précédent : aucune.',
-      previous_one: 'Le mois précédent : {{count}}.',
-      previous_other: 'Le mois précédent : {{count}}.',
-      previousNone: 'Pas de nuit notée le mois précédent.',
+    nights: {
+      title: 'Vos {{days}} dernières nuits',
+      restful_one: 'reposante',
+      restful_other: 'reposantes',
+      mixed_one: 'moyenne',
+      mixed_other: 'moyennes',
+      difficult_one: 'difficile',
+      difficult_other: 'difficiles',
+      logged: 'Sur {{logged}} nuits notées.',
+      a11y: '{{restful}} reposantes, {{mixed}} moyennes, {{difficult}} difficiles, sur {{logged}} nuits notées.',
       empty:
-        'Les nuits notées apparaîtront ici. La fréquence devient lisible au bout de quelques semaines.',
+        'Vos nuits apparaîtront ici. La tendance devient lisible au bout de quelques semaines.',
+      trend: {
+        moreRestful: 'Plus de nuits reposantes que le mois précédent ({{now}} contre {{before}}).',
+        fewerDifficult:
+          'Moins de nuits difficiles que le mois précédent ({{now}} contre {{before}}).',
+        steady: 'Un mois assez semblable au précédent.',
+        fewerRestful:
+          'Un peu moins de nuits reposantes que le mois précédent ({{now}} contre {{before}}).',
+        moreDifficult:
+          'Un peu plus de nuits difficiles que le mois précédent ({{now}} contre {{before}}).',
+        none: 'La comparaison avec le mois précédent viendra avec quelques nuits de plus.',
+      },
       how: 'Comment c’est compté',
       howBody:
-        'Une nuit est comptée comme difficile si vous l’avez ressentie comme difficile ou très difficile, s’il a fallu plus de 30 minutes pour vous endormir, ou si vous êtes resté·e éveillé·e plus de 30 minutes au total pendant la nuit. Ce sont les seuils habituels des agendas du sommeil. Ce n’est pas un diagnostic.',
+        'Reposante : ressentie comme plutôt bonne ou reposante. Difficile : ressentie comme difficile, ou plus de 30 minutes pour vous endormir, ou plus de 30 minutes éveillé·e au total dans la nuit (les seuils habituels des agendas du sommeil). Moyenne : tout le reste. Ce n’est pas un diagnostic.',
     },
     missing_one: '{{count}} nuit non notée ces derniers jours',
     missing_other: '{{count}} nuits non notées ces derniers jours',
     catchUp: 'Rattraper',
     insightTitle: 'À remarquer',
+    helpsTitle: 'Ce qui semble aider',
     seeTrends: 'Voir les tendances',
   },
   phrases: {
@@ -224,16 +236,15 @@ const fr = {
     previousMonth: 'Mois précédent',
     nextMonth: 'Mois suivant',
     legend:
-      'Une ligne par nuit, de 18 h à 14 h. Plus la lueur est vive, plus la nuit a été ressentie comme reposante. Les creux sombres sont les réveils.',
+      'Une ligne par nuit, de 18 h à 14 h. Plus la lueur est vive, plus la nuit a été ressentie comme reposante. Les creux sombres sont les réveils. Le point à gauche donne le ton : lumineux pour une nuit reposante, vert pour une nuit moyenne, pâle pour une nuit difficile.',
     notLogged: 'Non notée',
     addNight: 'Noter cette nuit',
     rowA11y: '{{date}} : {{summary}}',
     rowMissingA11y: '{{date}} : non notée',
-    difficultMark: 'difficile',
+    tone: { restful: 'reposante', mixed: 'moyenne', difficult: 'difficile' },
     empty: 'Aucune nuit notée ce mois-ci.',
-    monthSummary_zero: '{{nights}}, aucune difficile.',
-    monthSummary_one: '{{nights}}, dont {{count}} difficile.',
-    monthSummary_other: '{{nights}}, dont {{count}} difficiles.',
+    monthSummary:
+      '{{nights}} : {{restful}} reposantes, {{mixed}} moyennes, {{difficult}} difficiles.',
   },
   reports: {
     rhythm: 'Rythme',
@@ -262,6 +273,11 @@ const fr = {
       average: 'en moyenne',
       quality: 'Ressenti moyen',
     },
+    tones: {
+      title: 'Répartition',
+      value: '{{restful}} · {{mixed}} · {{difficult}}',
+      detail: 'reposantes · moyennes · difficiles',
+    },
     frequency: {
       title: 'Nuits difficiles',
       value: '{{difficult}} sur {{logged}}',
@@ -273,6 +289,16 @@ const fr = {
       more: 'Les nuits marquées « {{tag}} » : {{duration}} de sommeil en plus en moyenne ({{count}} nuits).',
       difficultRate: 'Nuits difficiles : {{tagged}} avec, {{untagged}} sans.',
       latency: 'Endormissement {{duration}} plus long en moyenne.',
+      helpsTitle: 'Ce qui semble aider',
+      weighsTitle: 'Ce qui semble peser',
+      restfulMore:
+        'Les nuits marquées « {{tag}} » sont plus souvent reposantes : {{tagged}} contre {{untagged}} ({{count}} nuits).',
+      difficultMore:
+        'Les nuits marquées « {{tag}} » sont plus souvent difficiles : {{tagged}} contre {{untagged}} ({{count}} nuits).',
+      restfulLess:
+        'Les nuits marquées « {{tag}} » sont moins souvent reposantes : {{tagged}} contre {{untagged}} ({{count}} nuits).',
+      difficultLess:
+        'Les nuits marquées « {{tag}} » sont moins souvent difficiles : {{tagged}} contre {{untagged}} ({{count}} nuits).',
       notEnough:
         'Les liens apparaissent quand un repère compte au moins 5 nuits avec et 5 nuits sans. Continuez à noter, sans pression.',
     },

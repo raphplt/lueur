@@ -1,5 +1,6 @@
 import {
   difficultFrequency,
+  toneTrend,
   mean,
   nightMetrics,
   nightsBetween,
@@ -126,6 +127,8 @@ describe('difficultFrequency', () => {
       days: 30,
       logged: 10,
       difficult: 4,
+      restful: 6,
+      mixed: 0,
     });
     expect(f.previous).toMatchObject({
       from: '2026-07-28',
@@ -137,5 +140,52 @@ describe('difficultFrequency', () => {
 
   it('filters by date range inclusively', () => {
     expect(nightsBetween(nights, '2026-09-24', '2026-09-25')).toHaveLength(2);
+  });
+});
+
+describe('night tone', () => {
+  it('classifies nights as restful, mixed or difficult', () => {
+    expect(nightMetrics(night({ date: '2026-09-25', quality: 5 })).tone).toBe('restful');
+    expect(nightMetrics(night({ date: '2026-09-25', quality: 4 })).tone).toBe('restful');
+    expect(nightMetrics(night({ date: '2026-09-25', quality: 3 })).tone).toBe('mixed');
+    expect(nightMetrics(night({ date: '2026-09-25', quality: 2 })).tone).toBe('difficult');
+    // Felt good, but 45 minutes to fall asleep: the diary threshold wins.
+    expect(nightMetrics(night({ date: '2026-09-25', quality: 5, latency: 45 })).tone).toBe(
+      'difficult',
+    );
+  });
+
+  it('counts the three tones in summaries', () => {
+    const s = summarize([
+      night({ date: '2026-09-23', quality: 5 }),
+      night({ date: '2026-09-24', quality: 3 }),
+      night({ date: '2026-09-25', quality: 1 }),
+    ]);
+    expect([s.restful, s.mixed, s.difficult]).toEqual([1, 1, 1]);
+  });
+});
+
+describe('toneTrend', () => {
+  const w = (logged: number, restful: number, difficult: number) => ({
+    from: '',
+    to: '',
+    days: 30,
+    logged,
+    restful,
+    difficult,
+    mixed: logged - restful - difficult,
+  });
+
+  it('states the direction from the positive side first', () => {
+    expect(toneTrend({ current: w(20, 12, 4), previous: w(20, 6, 6) })).toBe('moreRestful');
+    expect(toneTrend({ current: w(20, 6, 2), previous: w(20, 6, 8) })).toBe('fewerDifficult');
+    expect(toneTrend({ current: w(20, 6, 9), previous: w(20, 6, 4) })).toBe('moreDifficult');
+    expect(toneTrend({ current: w(20, 3, 4), previous: w(20, 8, 4) })).toBe('fewerRestful');
+    expect(toneTrend({ current: w(20, 8, 4), previous: w(20, 8, 5) })).toBe('steady');
+  });
+
+  it('waits for enough nights on both sides', () => {
+    expect(toneTrend({ current: w(6, 6, 0), previous: w(20, 1, 10) })).toBeNull();
+    expect(toneTrend({ current: w(20, 6, 0), previous: w(3, 1, 1) })).toBeNull();
   });
 });

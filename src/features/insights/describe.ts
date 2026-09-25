@@ -7,7 +7,12 @@ import {
   nightLabel,
   type AppLocale,
 } from '@/domain/format';
-import type { Drift, TagCorrelation, WeekendGap } from '@/domain/insights';
+import {
+  MIN_SLEEP_DELTA_MIN,
+  type Drift,
+  type TagCorrelation,
+  type WeekendGap,
+} from '@/domain/insights';
 import { nightMetrics } from '@/domain/metrics';
 import type { Night, Tag } from '@/domain/types';
 import { draftClock, nightToDraft } from '@/domain/draft';
@@ -15,6 +20,25 @@ import { draftClock, nightToDraft } from '@/domain/draft';
 export function tagLabel(tag: Tag | undefined, t: TFunction): string {
   if (!tag) return '?';
   return tag.key ? t(`tags.${tag.key}`) : (tag.label ?? '?');
+}
+
+/** With little difference in sleep time, speak of the rate that moved the most, in its real direction. */
+function usesRestful(c: TagCorrelation): boolean {
+  return (
+    Math.abs(c.restfulRateTagged - c.restfulRateUntagged) >=
+    Math.abs(c.difficultRateTagged - c.difficultRateUntagged)
+  );
+}
+
+function smallEffectKey(c: TagCorrelation) {
+  if (usesRestful(c)) {
+    return c.restfulRateTagged > c.restfulRateUntagged
+      ? 'reports.correlations.restfulMore'
+      : 'reports.correlations.restfulLess';
+  }
+  return c.difficultRateTagged > c.difficultRateUntagged
+    ? 'reports.correlations.difficultMore'
+    : 'reports.correlations.difficultLess';
 }
 
 export function describeCorrelation(
@@ -27,11 +51,21 @@ export function describeCorrelation(
     tags.find((x) => x.id === c.tagId),
     t,
   );
-  const main = t(c.sleepDeltaMin <= 0 ? 'reports.correlations.less' : 'reports.correlations.more', {
-    tag,
-    duration: formatDuration(c.sleepDeltaMin, locale),
-    count: c.taggedNights,
-  });
+  const pct = (v: number) => formatPercent(v, locale);
+  const main =
+    Math.abs(c.sleepDeltaMin) >= MIN_SLEEP_DELTA_MIN
+      ? t(c.sleepDeltaMin < 0 ? 'reports.correlations.less' : 'reports.correlations.more', {
+          tag,
+          duration: formatDuration(c.sleepDeltaMin, locale),
+          count: c.taggedNights,
+        })
+      : t(smallEffectKey(c), {
+          tag,
+          ...(usesRestful(c)
+            ? { tagged: pct(c.restfulRateTagged), untagged: pct(c.restfulRateUntagged) }
+            : { tagged: pct(c.difficultRateTagged), untagged: pct(c.difficultRateUntagged) }),
+          count: c.taggedNights,
+        });
   const parts = [
     t('reports.correlations.difficultRate', {
       tagged: formatPercent(c.difficultRateTagged, locale),

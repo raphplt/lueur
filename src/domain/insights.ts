@@ -22,6 +22,10 @@ export interface TagCorrelation {
   latencyDeltaMin: number;
   difficultRateTagged: number;
   difficultRateUntagged: number;
+  restfulRateTagged: number;
+  restfulRateUntagged: number;
+  /** The tag goes with better nights (more sleep, or more restful and fewer difficult nights). */
+  helpful: boolean;
 }
 
 /**
@@ -42,18 +46,28 @@ export function tagCorrelations(nights: Night[], tagIds: string[]): TagCorrelati
     const latU = mean(untagged.map(({ m }) => m.latencyMin)) ?? 0;
     const rateT = tagged.filter(({ m }) => m.isDifficult).length / tagged.length;
     const rateU = untagged.filter(({ m }) => m.isDifficult).length / untagged.length;
+    const restT = tagged.filter(({ m }) => m.tone === 'restful').length / tagged.length;
+    const restU = untagged.filter(({ m }) => m.tone === 'restful').length / untagged.length;
+    const sleepDelta = Math.round(sleepT - sleepU);
     const corr: TagCorrelation = {
       tagId,
       taggedNights: tagged.length,
       untaggedNights: untagged.length,
-      sleepDeltaMin: Math.round(sleepT - sleepU),
+      sleepDeltaMin: sleepDelta,
       latencyDeltaMin: Math.round(latT - latU),
       difficultRateTagged: rateT,
       difficultRateUntagged: rateU,
+      restfulRateTagged: restT,
+      restfulRateUntagged: restU,
+      helpful:
+        Math.abs(sleepDelta) >= MIN_SLEEP_DELTA_MIN
+          ? sleepDelta > 0
+          : restT - rateT > restU - rateU,
     };
     if (
       Math.abs(corr.sleepDeltaMin) >= MIN_SLEEP_DELTA_MIN ||
-      Math.abs(rateT - rateU) >= MIN_DIFFICULT_RATE_DELTA
+      Math.abs(rateT - rateU) >= MIN_DIFFICULT_RATE_DELTA ||
+      Math.abs(restT - restU) >= MIN_DIFFICULT_RATE_DELTA
     ) {
       out.push(corr);
     }

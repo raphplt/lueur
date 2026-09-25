@@ -119,7 +119,19 @@ Positions des éveils : quand l'heure est connue (mode nuit ou saisie sur la ban
 
 **Calendrier = tissage.** Une ligne par nuit, fines bandes (10 pt) espacées de 14 pt, jours à gauche en `label`. Les nuits manquantes sont un fil pointillé très discret. Les week-ends ont un fond `bgSunken` léger. Lu d'un coup d'œil : décalages, trous, nuits pâles.
 
-## 8. Ressenti
+## 8. Trois tons, pas seulement les nuits difficiles
+
+Chaque nuit a un **ton**, montré partout de la même façon :
+
+| Ton | Règle | Couleur |
+|---|---|---|
+| Reposante | ressenti ≥ 4, sans critère de nuit difficile | `light`, avec halo : la plus lumineuse |
+| Moyenne | tout le reste | `calm` (sauge) |
+| Difficile | ressenti ≤ 2, endormissement > 30 min ou éveils > 30 min | `textFaint` à 45 %, pâle |
+
+L'accueil montre les trois comptes, **reposantes d'abord**, et une phrase de tendance formulée par le côté positif quand c'est possible (« Plus de nuits reposantes que le mois précédent »). Les corrélations séparent « ce qui semble aider » (en premier) et « ce qui semble peser ». La nuit difficile reste mesurée (seuils utiles à un médecin, PDF) mais n'occupe plus le centre.
+
+## 8 bis. Ressenti
 
 Cinq niveaux dessinés, **ni étoiles ni visages** : cinq lueurs de taille et d'intensité croissantes (un point terne pour « très difficile », une lueur pleine avec halo pour « reposante »). Libellés : Très difficile · Difficile · Moyenne · Plutôt bonne · Reposante.
 

@@ -20,6 +20,9 @@ describe('demo data', () => {
     const freq = difficultFrequency(data.nights, '2026-09-25');
     expect(freq.current.difficult).toBeGreaterThan(0);
     expect(freq.previous.logged).toBeGreaterThan(0);
+    expect(freq.current.restful).toBeGreaterThan(0);
+    expect(freq.current.mixed).toBeGreaterThan(0);
+    expect(tagCorrelations(data.nights, ['tag-exercise'])[0]?.helpful).toBe(true);
     const corr = tagCorrelations(data.nights, ['tag-noise']);
     expect(corr[0]?.sleepDeltaMin).toBeLessThan(0);
     const env = environmentComparison(data.nights, data.environmentChanges[0]!);

@@ -58,3 +58,4 @@ build/
 # brand generation cache
 assets/brand/generated/.fontcache/
 assets/brand/generated/.fonts.conf
+assets/brand/explorations/.font*

@@ -133,6 +133,7 @@ export function Weave({
               testID={`weave-${d}`}
               disabled={!onPressDate}
               onPress={() => onPressDate?.(d)}
+              hitSlop={{ top: (44 - row) / 2, bottom: (44 - row) / 2 }}
               accessibilityRole={onPressDate ? 'button' : 'text'}
               accessibilityLabel={
                 n

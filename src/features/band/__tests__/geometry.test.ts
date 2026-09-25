@@ -1,6 +1,7 @@
 import {
   bandGeometry,
   entryAxis,
+  expandAxis,
   glowFor,
   minuteToX,
   WEAVE_AXIS,
@@ -64,5 +65,18 @@ describe('band geometry', () => {
     expect(short.toMin - short.fromMin).toBe(720);
     expect(short.fromMin).toBeLessThanOrEqual(-90);
     expect(short.toMin).toBeGreaterThanOrEqual(210);
+  });
+});
+
+describe('expandAxis', () => {
+  it('widens by whole steps near an edge, within limits', () => {
+    const axis = { fromMin: -180, toMin: 540 };
+    expect(expandAxis(axis, { bedMin: -60, outMin: 440 })).toBe(axis);
+    expect(expandAxis(axis, { bedMin: -170, outMin: 440 })).toEqual({ fromMin: -300, toMin: 540 });
+    expect(expandAxis(axis, { bedMin: -60, outMin: 520 })).toEqual({ fromMin: -180, toMin: 660 });
+    expect(expandAxis({ fromMin: -720, toMin: 1080 }, { bedMin: -700, outMin: 1070 })).toEqual({
+      fromMin: -720,
+      toMin: 1080,
+    });
   });
 });

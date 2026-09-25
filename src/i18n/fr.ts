@@ -205,6 +205,7 @@ const fr = {
       negativeLatency: 'Délai d’endormissement invalide.',
       latencyPastWake: 'L’endormissement doit précéder le réveil.',
       awakeningOutsideSleep: 'Un réveil sort de la période de sommeil.',
+      awakeningsOverlap: 'Deux réveils se chevauchent.',
       awakeningsTooLong: 'Les réveils dépassent la durée de la nuit.',
     },
     a11y: {

@@ -75,10 +75,25 @@ export async function requestPermission(): Promise<PermissionState> {
  * to the foreground (catches time-zone changes), after saving a night and
  * when reminder settings change.
  */
-export async function syncReminders(
+let queue: Promise<unknown> = Promise.resolve();
+
+/** Runs sync jobs one after the other so an older run never undoes a newer one. */
+export function syncReminders(
   settings: Settings,
   loggedDates: ReadonlySet<DateKey>,
 ): Promise<number> {
+  const job = queue.then(() => runSync(settings, loggedDates));
+  queue = job.catch(() => undefined);
+  return job;
+}
+
+export function cancelReminders(): Promise<void> {
+  const job = queue.then(() => Notifications.cancelAllScheduledNotificationsAsync());
+  queue = job.catch(() => undefined);
+  return job;
+}
+
+async function runSync(settings: Settings, loggedDates: ReadonlySet<DateKey>): Promise<number> {
   await Notifications.cancelAllScheduledNotificationsAsync();
   if ((await getPermission()) !== 'granted') return 0;
   const t = i18n.t.bind(i18n);

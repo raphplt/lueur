@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { formatDuration, formatPercent, nightLabel } from '@/domain/format';
+import { formatDuration, formatPercent, nightRange } from '@/domain/format';
 import { environmentComparison } from '@/domain/insights';
 import { addDays } from '@/domain/time';
 import type { EnvironmentChange } from '@/domain/types';
@@ -75,8 +75,7 @@ export default function Environment() {
               >
                 <Txt v="heading">{ch.label}</Txt>
                 <Txt v="caption" tone="textMuted">
-                  {t('environment.from')}{' '}
-                  {nightLabel(ch.date, locale).replace(/^(nuit du |night of )/, '')}
+                  {t('environment.from')} {nightRange(ch.date, locale)}
                 </Txt>
                 {ch.note && (
                   <Txt v="caption" tone="textMuted">
@@ -168,18 +167,18 @@ export default function Environment() {
             <View style={styles.dateRow}>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="−1"
+                accessibilityLabel={t('entry.previousNight')}
                 onPress={() => setForm({ ...form, date: addDays(form.date, -1) })}
                 style={styles.nav}
               >
                 <Icon name="chevronLeft" color={c.textMuted} />
               </Pressable>
               <Txt v="bodyStrong" align="center" style={styles.flex}>
-                {nightLabel(form.date, locale).replace(/^(nuit du |night of )/, '')}
+                {nightRange(form.date, locale)}
               </Txt>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="+1"
+                accessibilityLabel={t('entry.nextNight')}
                 disabled={form.date >= today}
                 onPress={() => setForm({ ...form, date: addDays(form.date, 1) })}
                 style={[styles.nav, form.date >= today && styles.dim]}

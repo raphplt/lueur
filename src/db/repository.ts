@@ -271,6 +271,11 @@ export function writeSettings(db: LueurDb, values: Record<string, unknown>): voi
   db.transaction((tx) => {
     for (const [key, value] of Object.entries(values)) {
       if (value === undefined) continue;
+      // SQL NOT NULL: a null setting is stored as "absent" and read back as its default.
+      if (value === null) {
+        tx.delete(s.settings).where(eq(s.settings.key, key)).run();
+        continue;
+      }
       tx.insert(s.settings)
         .values({ key, value })
         .onConflictDoUpdate({ target: s.settings.key, set: { value } })
@@ -331,6 +336,7 @@ export function replaceAll(db: LueurDb, data: ExportData, now: Instant): void {
       tx.insert(s.environmentChanges).values(data.environmentChanges).run();
     }
     for (const [key, value] of Object.entries(data.settings)) {
+      if (value === null || value === undefined) continue;
       tx.insert(s.settings).values({ key, value }).run();
     }
   });

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
 
-import { configureChannels, syncReminders } from '@/notifications';
+import { cancelReminders, configureChannels, syncReminders } from '@/notifications';
 import { useData } from '@/store/data';
 import { useSettings } from '@/store/settings';
 
@@ -17,7 +17,12 @@ export function useReminderSync(enabled: boolean) {
   }, [enabled, language]);
 
   useEffect(() => {
-    if (!enabled || !settings.onboarded) return;
+    if (!enabled) return;
+    if (!settings.onboarded) {
+      // After "erase everything", nothing scheduled earlier may still fire.
+      void cancelReminders();
+      return;
+    }
     const run = () =>
       void syncReminders(settings, new Set(nights.map((n) => n.wakeDate))).catch((e: unknown) =>
         console.warn('reminders', e),

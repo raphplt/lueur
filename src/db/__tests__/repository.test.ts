@@ -125,6 +125,10 @@ describe('repository', () => {
     writeSettings(db, { hour12: true, reminder: { enabled: true, clock: 480 }, skip: undefined });
     writeSettings(db, { hour12: false });
     expect(readSettings(db)).toEqual({ hour12: false, reminder: { enabled: true, clock: 480 } });
+    // null means "back to default": the row is removed (NOT NULL column).
+    writeSettings(db, { goal: 'understand' });
+    writeSettings(db, { goal: null });
+    expect(readSettings(db)).not.toHaveProperty('goal');
   });
 
   it('exports, wipes and restores everything', () => {

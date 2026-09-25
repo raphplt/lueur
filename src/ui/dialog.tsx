@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { withAlpha } from './backdrop';
@@ -32,6 +33,7 @@ export function Dialog({
   children?: ReactNode;
 }) {
   const { c } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   return (
     <Modal
@@ -43,7 +45,7 @@ export function Dialog({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="dismiss"
+        accessibilityLabel={t('common.close')}
         style={[styles.scrim, { backgroundColor: withAlpha('#0B0A0C', 0.55) }]}
         onPress={onDismiss}
       />

@@ -135,7 +135,14 @@ export default function Data() {
             testID: 'confirm-import',
             onPress: () => {
               if (!pending) return;
-              replaceAll(pending);
+              try {
+                replaceAll(pending);
+              } catch (e) {
+                console.warn('import', e);
+                toast(t('data.importError'));
+                setPending(null);
+                return;
+              }
               loadSettings();
               // A restored diary never sends the user back to the questionnaire.
               useSettings.getState().update({ onboarded: true });

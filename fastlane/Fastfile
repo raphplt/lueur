@@ -88,10 +88,10 @@ platform :android do
 
   desc 'Fails if the merged release manifest still requests network access'
   private_lane :verify_no_internet_permission do
-    manifest = Dir[File.join(ROOT, 'android/app/build/intermediates/merged_manifest/release/**/AndroidManifest.xml')].first
+    manifest = Dir[File.join(ROOT, 'android/app/build/intermediates/merged_manifest*/release/**/AndroidManifest.xml')].first
     UI.user_error!('Merged release manifest not found') unless manifest
     content = File.read(manifest)
-    if content.include?('android.permission.INTERNET')
+    if content.include?('"android.permission.INTERNET"')
       UI.user_error!('INTERNET permission found in the release manifest')
     end
     UI.success('Release manifest has no INTERNET permission')

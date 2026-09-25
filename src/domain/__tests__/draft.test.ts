@@ -3,11 +3,13 @@ import {
   defaultDraft,
   draftClock,
   draftToNight,
+  mergeAwakenings,
   nightToDraft,
   normalizeDraft,
   spreadAwakenings,
   validateDraft,
   wakeEventsToDraftAwakenings,
+  zoneOfNight,
   type NightDraft,
 } from '../draft';
 import { nightMetrics } from '../metrics';
@@ -154,10 +156,8 @@ describe('defaults', () => {
       deviceZone,
       draft,
     );
-    expect(res).toEqual([
-      { startMin: -30, durationMin: 20 },
-      { startMin: -30, durationMin: 10 },
-    ]);
+    // Overlapping events are merged: no minute counted twice.
+    expect(res).toEqual([{ startMin: -30, durationMin: 20 }]);
   });
 });
 
@@ -220,5 +220,64 @@ describe('validation & normalisation', () => {
   it('maps draft minutes to clock', () => {
     expect(draftClock(-60)).toBe(1380);
     expect(draftClock(420)).toBe(420);
+  });
+});
+
+describe('review fixes', () => {
+  it('merges overlapping awakenings and flags overlaps', () => {
+    const d = {
+      ...base,
+      awakenings: [
+        { startMin: 100, durationMin: 60 },
+        { startMin: 130, durationMin: 20 },
+      ],
+    };
+    expect(validateDraft(d)).toContain('awakeningsOverlap');
+    expect(normalizeDraft(d).awakenings).toEqual([{ startMin: 100, durationMin: 60 }]);
+    expect(
+      mergeAwakenings([
+        { startMin: 200, durationMin: 10 },
+        { startMin: 100, durationMin: 105 },
+      ]),
+    ).toEqual([{ startMin: 100, durationMin: 110 }]);
+  });
+
+  it('never rounds a night-mode awakening past the final wake', () => {
+    const at = (min: number) => deviceZone.toInstant('2026-09-25', min);
+    const res = wakeEventsToDraftAwakenings(
+      [{ id: 'e', startedAt: at(437), endedAt: at(438), nightId: null }],
+      '2026-09-25',
+      deviceZone,
+      { bedMin: -60, latencyMin: 10, finalWakeMin: 440 },
+    );
+    expect(res).toEqual([{ startMin: 437, durationMin: 3 }]);
+  });
+
+  it('keeps the instants of a night recorded in another zone when edited', () => {
+    const ny = draftToNight(base, { id: 'x', now: 0, zone: fixedZone(-240) });
+    const edited = draftToNight(
+      { ...nightToDraft(ny), quality: 5 },
+      { id: 'y', now: 1, zone: zoneOfNight(ny), existing: ny },
+    );
+    expect(edited.bedtimeAt).toBe(ny.bedtimeAt);
+    expect(edited.outOfBedAt).toBe(ny.outOfBedAt);
+    expect(edited.bedOffsetMin).toBe(-240);
+    expect(edited.awakenings).toEqual(ny.awakenings);
+  });
+
+  it('keeps DST offsets when editing a fall-back night', () => {
+    const n = draftToNight(
+      { ...base, wakeDate: '2026-10-25' },
+      { id: 'x', now: 0, zone: deviceZone },
+    );
+    const again = draftToNight(nightToDraft(n), {
+      id: 'x',
+      now: 0,
+      zone: zoneOfNight(n),
+      existing: n,
+    });
+    expect(again.bedtimeAt).toBe(n.bedtimeAt);
+    expect(again.finalWakeAt).toBe(n.finalWakeAt);
+    expect(again.wakeOffsetMin).toBe(60);
   });
 });

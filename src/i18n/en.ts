@@ -193,7 +193,7 @@ const en: Strings = {
     summary: '{{sleep}} of estimated sleep · {{efficiency}} of time in bed',
     saved: 'Night saved',
     deleteNight: 'Delete this night',
-    deleteConfirm: 'Delete the {{label}}? This cannot be undone.',
+    deleteConfirm: 'Delete the night of {{label}}? This cannot be undone.',
     chooseQuality: 'Choose how it felt to save.',
     issues: {
       noQuality: 'Choose how it felt.',
@@ -203,6 +203,7 @@ const en: Strings = {
       negativeLatency: 'Invalid time to fall asleep.',
       latencyPastWake: 'Falling asleep must come before waking up.',
       awakeningOutsideSleep: 'An awakening falls outside the sleep period.',
+      awakeningsOverlap: 'Two awakenings overlap.',
       awakeningsTooLong: 'Awakenings add up to more than the night.',
     },
     a11y: {

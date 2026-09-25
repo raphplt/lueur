@@ -244,6 +244,10 @@ export function parseExport(raw: string | unknown): ParseResult {
       errors.push(`tags[${i}]`);
       return;
     }
+    if (tags.some((x) => x.id === t.id || (t.key !== null && x.key === t.key))) {
+      errors.push(`tags[${i}]: duplicate`);
+      return;
+    }
     tags.push({
       id: t.id,
       key: t.key as DefaultTagKey | null,
@@ -280,12 +284,12 @@ export function parseExport(raw: string | unknown): ParseResult {
       errors.push(`nights[${i}]`);
       return;
     }
-    if (seenDates.has(n.wakeDate)) {
+    if (seenDates.has(n.wakeDate) || nights.some((x) => x.id === n.id)) {
       errors.push(`nights[${i}]: duplicate ${n.wakeDate}`);
       return;
     }
     seenDates.add(n.wakeDate);
-    const nightTags = Array.isArray(n.tags) ? n.tags.filter(isStr) : [];
+    const nightTags = Array.isArray(n.tags) ? [...new Set(n.tags.filter(isStr))] : [];
     const created = parseUtc(n.createdAt) ?? bed.instant;
     nights.push({
       id: n.id,
@@ -311,7 +315,7 @@ export function parseExport(raw: string | unknown): ParseResult {
 
   arr('wakeEvents').forEach((e, i) => {
     const started = isObj(e) ? parseUtc(e.startedAt) : null;
-    if (!isObj(e) || !isStr(e.id) || started === null) {
+    if (!isObj(e) || !isStr(e.id) || started === null || wakeEvents.some((x) => x.id === e.id)) {
       errors.push(`wakeEvents[${i}]`);
       return;
     }
@@ -320,7 +324,13 @@ export function parseExport(raw: string | unknown): ParseResult {
   });
 
   arr('environmentChanges').forEach((c, i) => {
-    if (!isObj(c) || !isStr(c.id) || !isDateKey(c.date) || !isStr(c.label)) {
+    if (
+      !isObj(c) ||
+      !isStr(c.id) ||
+      !isDateKey(c.date) ||
+      !isStr(c.label) ||
+      environmentChanges.some((x) => x.id === c.id)
+    ) {
       errors.push(`environmentChanges[${i}]`);
       return;
     }
@@ -341,7 +351,11 @@ export function parseExport(raw: string | unknown): ParseResult {
       nights,
       wakeEvents,
       environmentChanges,
-      settings: isObj(json.settings) ? json.settings : {},
+      settings: isObj(json.settings)
+        ? Object.fromEntries(
+            Object.entries(json.settings).filter(([, v]) => v !== null && v !== undefined),
+          )
+        : {},
     },
   };
 }

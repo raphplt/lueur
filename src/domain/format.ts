@@ -67,6 +67,11 @@ export function formatDateKey(key: DateKey, pattern: string, locale: AppLocale):
   return formatDate(keyToLocalDate(key), pattern, { locale: dateFnsLocale(locale) });
 }
 
+/** Date range of a night without the "nuit du / night of" prefix: "24 au 25 sept." / "24–25 Sep". */
+export function nightRange(wakeDate: DateKey, locale: AppLocale): string {
+  return nightLabel(wakeDate, locale).replace(/^(nuit du |night of )/, '');
+}
+
 /**
  * Label for the night ending on `wakeDate`:
  * fr "nuit du 24 au 25 sept." / "nuit du 31 août au 1er sept." — en "night of 24–25 Sept".

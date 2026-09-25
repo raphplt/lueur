@@ -30,7 +30,10 @@ function useNotificationRouting(ready: boolean) {
     if (!ready) return;
     const open = (r: Notifications.NotificationResponse | null) => {
       const url = r && responseUrl(r);
-      if (url) router.push(url as never);
+      if (!url) return;
+      // Handled once: a recreated activity must not replay it.
+      Notifications.clearLastNotificationResponse();
+      router.push(url as never);
     };
     open(Notifications.getLastNotificationResponse());
     const sub = Notifications.addNotificationResponseReceivedListener(open);

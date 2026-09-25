@@ -130,3 +130,23 @@ export function entryAxis(input: Pick<BandInput, 'bedMin' | 'outMin'>, minSpanMi
   }
   return { fromMin: from, toMin: to };
 }
+
+/** Bounds of the entry axis: noon the day before → 18:00 on the wake date. */
+export const ENTRY_AXIS_LIMITS: Axis = { fromMin: -12 * 60, toMin: 18 * 60 };
+
+/**
+ * Widens the entry axis by whole hours when the night comes within `margin`
+ * minutes of an edge, so any bedtime or rise time stays reachable.
+ */
+export function expandAxis(
+  axis: Axis,
+  input: Pick<BandInput, 'bedMin' | 'outMin'>,
+  margin = 45,
+  step = 120,
+  limits: Axis = ENTRY_AXIS_LIMITS,
+): Axis {
+  let { fromMin, toMin } = axis;
+  if (input.bedMin - fromMin < margin) fromMin = Math.max(limits.fromMin, fromMin - step);
+  if (toMin - input.outMin < margin) toMin = Math.min(limits.toMin, toMin + step);
+  return fromMin === axis.fromMin && toMin === axis.toMin ? axis : { fromMin, toMin };
+}

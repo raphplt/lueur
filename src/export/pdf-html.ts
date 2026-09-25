@@ -6,6 +6,7 @@ import {
   formatClockFromNoon,
   formatDateKey,
   formatDuration,
+  formatHourShort,
   formatPercent,
   type AppLocale,
 } from '@/domain/format';
@@ -186,7 +187,7 @@ ${summaryItems.map(([k, v]) => `<div><span class="muted">${escapeHtml(k)}</span>
 </div>
 <table>
 <thead><tr>
-<th>${escapeHtml(col.night ?? '')}</th><th>18h → 14h</th><th>${escapeHtml(col.bed ?? '')}</th><th>${escapeHtml(col.latency ?? '')}</th>
+<th>${escapeHtml(col.night ?? '')}</th><th>${escapeHtml(`${formatHourShort(-360, hour12, locale)} → ${formatHourShort(840, hour12, locale)}`)}</th><th>${escapeHtml(col.bed ?? '')}</th><th>${escapeHtml(col.latency ?? '')}</th>
 <th>${escapeHtml(col.awakenings ?? '')}</th><th>${escapeHtml(col.wake ?? '')}</th><th>${escapeHtml(col.out ?? '')}</th>
 <th>${escapeHtml(col.inBed ?? '')}</th><th>${escapeHtml(col.sleep ?? '')}</th><th>${escapeHtml(col.efficiency ?? '')}</th>
 <th>${escapeHtml(col.quality ?? '')}</th><th>${escapeHtml(col.tags ?? '')}</th><th>${escapeHtml(col.note ?? '')}</th>

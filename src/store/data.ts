@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import * as repo from '@/db/repository';
-import { draftToNight, type NightDraft } from '@/domain/draft';
+import { draftToNight, zoneOfNight, type NightDraft } from '@/domain/draft';
 import type { ExportData } from '@/domain/export-format';
 import { uuid } from '@/domain/id';
 import { deviceZone } from '@/domain/time';
@@ -55,10 +55,14 @@ export const useData = create<DataState>((set, get) => {
 
     saveDraft: (draft) => {
       const existing = get().nights.find((n) => n.wakeDate === draft.wakeDate) ?? null;
-      const night = draftToNight(draft, {
+      // A tag may have been deleted while the entry was open.
+      const known = new Set(get().tags.map((t) => t.id));
+      const clean = { ...draft, tagIds: draft.tagIds.filter((id) => known.has(id)) };
+      // Editing keeps the offsets the night was recorded with (travel, DST).
+      const night = draftToNight(clean, {
         id: uuid(),
         now: Date.now(),
-        zone: deviceZone,
+        zone: existing ? zoneOfNight(existing) : deviceZone,
         existing,
       });
       repo.saveNight(getDb(), night);

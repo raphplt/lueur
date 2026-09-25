@@ -33,7 +33,8 @@ type Phase = 'breathing' | 'suggest' | 'up';
 function useDimScreen() {
   useEffect(() => {
     let previous: number | null = null;
-    void (async () => {
+    // The restore waits for the dimming to finish, even on a very quick exit.
+    const dimmed = (async () => {
       try {
         previous = await Brightness.getBrightnessAsync();
         await Brightness.setBrightnessAsync(DIM_BRIGHTNESS);
@@ -42,19 +43,44 @@ function useDimScreen() {
       }
     })();
     return () => {
-      if (Platform.OS === 'android')
-        void Brightness.restoreSystemBrightnessAsync().catch(() => undefined);
-      else if (previous !== null)
-        void Brightness.setBrightnessAsync(previous).catch(() => undefined);
+      void dimmed
+        .then(() => {
+          if (Platform.OS === 'android') return Brightness.restoreSystemBrightnessAsync();
+          if (previous !== null) return Brightness.setBrightnessAsync(previous);
+        })
+        .catch(() => undefined);
     };
   }, []);
 }
 
-/** Records this awakening for tonight's entry; closes it when leaving. */
+/** An awakening left open (fell asleep with the screen on) never counts for more than this. */
+export const MAX_WAKE_EVENT_MS = 60 * 60_000;
+
+/**
+ * Records this awakening for tonight's entry while the screen is in front;
+ * leaving, locking the phone or switching apps closes it.
+ */
 function useWakeEvent() {
   useEffect(() => {
-    const ev = startWakeEvent(getDb(), Date.now());
-    return () => endWakeEvent(getDb(), ev.id, Date.now());
+    let current: { id: string; startedAt: number } | null = null;
+    const start = () => {
+      if (!current) current = startWakeEvent(getDb(), Date.now());
+    };
+    const end = () => {
+      if (!current) return;
+      endWakeEvent(
+        getDb(),
+        current.id,
+        Math.min(Date.now(), current.startedAt + MAX_WAKE_EVENT_MS),
+      );
+      current = null;
+    };
+    start();
+    const sub = AppState.addEventListener('change', (s) => (s === 'active' ? start() : end()));
+    return () => {
+      sub.remove();
+      end();
+    };
   }, []);
 }
 

@@ -162,3 +162,35 @@ describe('CSV export', () => {
     );
   });
 });
+
+describe('import validation of duplicates', () => {
+  const base = buildExport(data, { now: 0, appVersion: '1.0.0' });
+
+  it('rejects duplicate ids and built-in keys', () => {
+    const dupTag = structuredClone(base);
+    dupTag.tags.push({ ...dupTag.tags[0]! });
+    expect(parseExport(dupTag).ok).toBe(false);
+    const dupKey = structuredClone(base);
+    dupKey.tags.push({ ...dupKey.tags[0]!, id: 'other' });
+    expect(parseExport(dupKey).ok).toBe(false);
+    const dupNightId = structuredClone(base);
+    dupNightId.nights[1]!.id = dupNightId.nights[0]!.id;
+    expect(parseExport(dupNightId).ok).toBe(false);
+    const dupEvent = structuredClone(base);
+    dupEvent.wakeEvents.push({ ...dupEvent.wakeEvents[0]! });
+    expect(parseExport(dupEvent).ok).toBe(false);
+    const dupEnv = structuredClone(base);
+    dupEnv.environmentChanges.push({ ...dupEnv.environmentChanges[0]! });
+    expect(parseExport(dupEnv).ok).toBe(false);
+  });
+
+  it('dedupes night tags and drops null settings', () => {
+    const e = structuredClone(base);
+    e.nights[2]!.tags = ['t1', 't1'];
+    e.settings = { goal: null, hour12: true };
+    const res = parseExport(e);
+    if (!res.ok) throw new Error(res.errors.join());
+    expect(res.data.nights.find((n) => n.wakeDate === '2026-09-25')!.tagIds).toEqual(['t1']);
+    expect(res.data.settings).toEqual({ hour12: true });
+  });
+});

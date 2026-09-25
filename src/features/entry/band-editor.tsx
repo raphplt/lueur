@@ -19,6 +19,7 @@ import { formatClock, formatHourShort } from '@/domain/format';
 import { roundTo } from '@/domain/time';
 import { BandShape } from '@/features/band/band-shape';
 import {
+  ENTRY_AXIS_LIMITS,
   bandGeometry,
   bandInputFromDraft,
   minuteToX,
@@ -65,10 +66,13 @@ export function BandEditor({
   onChange,
   selected,
   onSelect,
+  onSettle,
 }: {
   draft: NightDraft;
   axis: Axis;
   onChange: (d: NightDraft) => void;
+  /** Called after a handle was moved, so the axis can widen if needed. */
+  onSettle: () => void;
   selected: number | null;
   onSelect: (index: number | null) => void;
 }) {
@@ -77,11 +81,13 @@ export function BandEditor({
   const { t } = useTranslation();
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<HandleKey | null>(null);
-  const drag = useRef<{ candidates: HandleKey[]; handle: HandleKey | null; last: number }>({
-    candidates: [],
-    handle: null,
-    last: NaN,
-  });
+  const drag = useRef<{
+    candidates: HandleKey[];
+    handle: HandleKey | null;
+    last: number;
+    /** Draft when the drag began: moves are applied to it, so sweeping back restores awakenings. */
+    origin: NightDraft | null;
+  }>({ candidates: [], handle: null, last: NaN, origin: null });
 
   const x = (min: number) => minuteToX(min, axis, width);
   const toMin = (px: number) => roundTo(xToMinute(px, axis, width), SNAP);
@@ -105,7 +111,7 @@ export function BandEditor({
     .runOnJS(true)
     .minDistance(2)
     .onBegin((e) => {
-      drag.current = { candidates: nearHandles(e.x), handle: null, last: NaN };
+      drag.current = { candidates: nearHandles(e.x), handle: null, last: NaN, origin: draft };
       if (drag.current.candidates.length === 1) setActive(drag.current.candidates[0]!);
     })
     .onUpdate((e) => {
@@ -123,11 +129,13 @@ export function BandEditor({
       if (min === st.last) return;
       st.last = min;
       void Haptics.selectionAsync();
-      onChange(moveHandle(draft, st.handle, min, axis));
+      onChange(moveHandle(st.origin ?? draft, st.handle, min, ENTRY_AXIS_LIMITS));
     })
     .onFinalize(() => {
-      drag.current = { candidates: [], handle: null, last: NaN };
+      const moved = drag.current.handle !== null;
+      drag.current = { candidates: [], handle: null, last: NaN, origin: null };
       setActive(null);
+      if (moved) onSettle();
     });
   /* eslint-enable react-hooks/refs */
 
@@ -184,7 +192,8 @@ export function BandEditor({
               accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
               onAccessibilityAction={(e) => {
                 const delta = e.nativeEvent.actionName === 'increment' ? SNAP : -SNAP;
-                onChange(moveHandle(draft, h, min + delta, axis));
+                onChange(moveHandle(draft, h, min + delta, ENTRY_AXIS_LIMITS));
+                onSettle();
               }}
             >
               <Txt

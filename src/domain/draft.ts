@@ -125,9 +125,11 @@ export function wakeEventsToDraftAwakenings(
     if (startMin + durationMin <= onset || startMin >= draft.finalWakeMin) continue;
     const start = Math.max(startMin, onset);
     const end = Math.min(startMin + durationMin, draft.finalWakeMin);
-    out.push({ startMin: start, durationMin: roundDuration(end - start) });
+    // Rounded to 5 min but never past the final wake.
+    const rounded = Math.min(roundDuration(end - start), draft.finalWakeMin - start);
+    if (rounded > 0) out.push({ startMin: start, durationMin: rounded });
   }
-  return out.sort((a, b) => a.startMin - b.startMin);
+  return mergeAwakenings(out);
 }
 
 function roundDuration(min: number): number {
@@ -165,6 +167,27 @@ export function nightToDraft(night: Night): NightDraft {
     quality: night.quality,
     tagIds: [...night.tagIds],
     note: night.note ?? '',
+  };
+}
+
+/**
+ * Zone reproducing the offsets a night was recorded with, so editing a night
+ * logged in another time zone (or on a DST night) keeps its real instants.
+ * Wall-clock minutes before 02:00 use the bedtime offset, later ones the wake offset.
+ */
+export function zoneOfNight(night: Night): Zone {
+  const offsetFor = (minutes: number) =>
+    minutes < DST_SWITCH_REL_MIN ? night.bedOffsetMin : night.wakeOffsetMin;
+  return {
+    toInstant(date, minutes) {
+      const { y, m, d } = parseDateKey(date);
+      return Date.UTC(y, m - 1, d) + (minutes - offsetFor(minutes)) * MINUTE;
+    },
+    offsetAt(instant) {
+      const { y, m, d } = parseDateKey(night.wakeDate);
+      const rel = (instant + night.bedOffsetMin * MINUTE - Date.UTC(y, m - 1, d)) / MINUTE;
+      return offsetFor(rel);
+    },
   };
 }
 
@@ -217,7 +240,8 @@ export type DraftIssue =
   | 'negativeLatency'
   | 'latencyPastWake'
   | 'awakeningOutsideSleep'
-  | 'awakeningsTooLong';
+  | 'awakeningsTooLong'
+  | 'awakeningsOverlap';
 
 export function validateDraft(draft: NightDraft): DraftIssue[] {
   const issues: DraftIssue[] = [];
@@ -241,7 +265,31 @@ export function validateDraft(draft: NightDraft): DraftIssue[] {
   if (draftWasoMin(draft) > Math.max(0, draft.finalWakeMin - onset)) {
     issues.push('awakeningsTooLong');
   }
+  const sorted = [...draft.awakenings].sort((a, b) => a.startMin - b.startMin);
+  if (
+    sorted.some(
+      (a, i) => i > 0 && a.startMin < sorted[i - 1]!.startMin + sorted[i - 1]!.durationMin,
+    )
+  ) {
+    issues.push('awakeningsOverlap');
+  }
   return issues;
+}
+
+/** Sorts awakenings and merges those that overlap, so no minute is counted twice. */
+export function mergeAwakenings(list: DraftAwakening[]): DraftAwakening[] {
+  const sorted = [...list].sort((a, b) => a.startMin - b.startMin);
+  const out: DraftAwakening[] = [];
+  for (const a of sorted) {
+    const last = out[out.length - 1];
+    if (last && a.startMin < last.startMin + last.durationMin) {
+      const end = Math.max(last.startMin + last.durationMin, a.startMin + a.durationMin);
+      last.durationMin = end - last.startMin;
+    } else {
+      out.push({ ...a });
+    }
+  }
+  return out;
 }
 
 /**
@@ -253,13 +301,15 @@ export function normalizeDraft(draft: NightDraft): NightDraft {
   const outOfBedMin = Math.max(draft.outOfBedMin, finalWakeMin);
   const latencyMin = Math.min(Math.max(0, draft.latencyMin), finalWakeMin - draft.bedMin);
   const onset = draft.bedMin + latencyMin;
-  const awakenings = draft.awakenings
-    .map((a) => {
-      const start = Math.max(a.startMin, onset);
-      const end = Math.min(a.startMin + a.durationMin, finalWakeMin);
-      return { startMin: start, durationMin: end - start };
-    })
-    .filter((a) => a.durationMin >= 5);
+  const awakenings = mergeAwakenings(
+    draft.awakenings
+      .map((a) => {
+        const start = Math.max(a.startMin, onset);
+        const end = Math.min(a.startMin + a.durationMin, finalWakeMin);
+        return { startMin: start, durationMin: end - start };
+      })
+      .filter((a) => a.durationMin >= 5),
+  );
   return { ...draft, finalWakeMin, outOfBedMin, latencyMin, awakenings };
 }
 

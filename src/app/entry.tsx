@@ -12,9 +12,15 @@ import {
   validateDraft,
   type NightDraft,
 } from '@/domain/draft';
-import { formatClock, formatDuration, formatPercent, nightLabel } from '@/domain/format';
+import {
+  formatClock,
+  formatDuration,
+  formatPercent,
+  nightLabel,
+  nightRange,
+} from '@/domain/format';
 import { addDays, deviceZone, diffDays, isDateKey } from '@/domain/time';
-import { bandInputFromDraft, entryAxis } from '@/features/band/geometry';
+import { bandInputFromDraft, entryAxis, expandAxis } from '@/features/band/geometry';
 import { BandEditor, DEFAULT_AWAKENING_MIN } from '@/features/entry/band-editor';
 import { addAwakeningInLongestGap } from '@/features/entry/handles';
 import { QualityPicker } from '@/features/entry/quality-picker';
@@ -71,8 +77,14 @@ export default function Entry() {
     return { ...built, axis: entryAxis(bandInputFromDraft(built.draft)) };
   });
   const { draft, axis, imported } = state;
-  const setDraft = (d: NightDraft) => setState((s) => ({ ...s, draft: d }));
   const [selected, setSelected] = useState<number | null>(null);
+  const setDraft = (d: NightDraft) => {
+    // Indexes shift when awakenings are added, merged or removed.
+    if (d.awakenings.length !== draft.awakenings.length) setSelected(null);
+    setState((s) => ({ ...s, draft: d }));
+  };
+  const widenAxis = () =>
+    setState((s) => ({ ...s, axis: expandAxis(s.axis, bandInputFromDraft(s.draft)) }));
   const [noteOpen, setNoteOpen] = useState(draft.note.length > 0);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -163,6 +175,7 @@ export default function Entry() {
         onChange={setDraft}
         selected={selected}
         onSelect={setSelected}
+        onSettle={widenAxis}
       />
 
       <Txt v="caption" tone="textMuted" style={styles.hint}>
@@ -215,7 +228,11 @@ export default function Entry() {
                 selected={selectedAwakening.durationMin === m}
                 onPress={() => {
                   const onsetMin = draft.bedMin + draft.latencyMin;
-                  const room = draft.finalWakeMin - Math.max(onsetMin, selectedAwakening.startMin);
+                  const following = draft.awakenings.find(
+                    (a) => a.startMin > selectedAwakening.startMin,
+                  );
+                  const limit = Math.min(draft.finalWakeMin, following?.startMin ?? Infinity);
+                  const room = limit - Math.max(onsetMin, selectedAwakening.startMin);
                   const next = draft.awakenings.map((a, i) =>
                     i === selected ? { ...a, durationMin: Math.min(m, room) } : a,
                   );
@@ -235,19 +252,36 @@ export default function Entry() {
           />
         </View>
       ) : (
-        <Button
-          testID="add-awakening"
-          variant="quiet"
-          label={`+ ${t('entry.addAwakening')}`}
-          onPress={() => {
-            const next = addAwakeningInLongestGap(draft, DEFAULT_AWAKENING_MIN);
-            if (next === draft) return;
-            setDraft(next);
-            const known = new Set(draft.awakenings.map((a) => a.startMin));
-            setSelected(next.awakenings.findIndex((a) => !known.has(a.startMin)));
-          }}
-          style={styles.left}
-        />
+        <>
+          {draft.awakenings.length > 0 && (
+            <View style={styles.awakeningList}>
+              <ChipGroup>
+                {draft.awakenings.map((a, i) => (
+                  <Chip
+                    key={`${a.startMin}-${i}`}
+                    testID={`awakening-item-${i}`}
+                    label={`${formatClock(draftClock(a.startMin), hour12)} · ${formatDuration(a.durationMin, locale)}`}
+                    selected={false}
+                    onPress={() => setSelected(i)}
+                  />
+                ))}
+              </ChipGroup>
+            </View>
+          )}
+          <Button
+            testID="add-awakening"
+            variant="quiet"
+            label={`+ ${t('entry.addAwakening')}`}
+            onPress={() => {
+              const next = addAwakeningInLongestGap(draft, DEFAULT_AWAKENING_MIN);
+              if (next === draft) return;
+              setDraft(next);
+              const known = new Set(draft.awakenings.map((a) => a.startMin));
+              setSelected(next.awakenings.findIndex((a) => !known.has(a.startMin)));
+            }}
+            style={styles.left}
+          />
+        </>
       )}
 
       <SectionTitle>{t('quality.title')}</SectionTitle>
@@ -320,7 +354,7 @@ export default function Entry() {
       <Dialog
         visible={confirmDelete}
         message={t('entry.deleteConfirm', {
-          label: nightLabel(draft.wakeDate, locale).replace(/^(nuit du |night of )/, ''),
+          label: nightRange(draft.wakeDate, locale),
         })}
         onDismiss={() => setConfirmDelete(false)}
         actions={[
@@ -352,6 +386,7 @@ const styles = StyleSheet.create({
   dim: { opacity: 0.3 },
   hint: { marginTop: space.xxs },
   summary: { marginTop: space.lg, gap: space.xxs },
+  awakeningList: { marginTop: space.md },
   awakening: {
     marginTop: space.md,
     padding: space.md,

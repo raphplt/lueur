@@ -1,0 +1,11 @@
+Lueur is a sleep diary that works entirely on the device.
+
+- There is no account, no sign-in and no server: no demo credentials are needed. Every feature is available on first launch.
+- The onboarding questions can be skipped with "Skip the questions".
+- To try the main flow: tap "Log my night" on the Home tab, drag the points on the night band, pick how the night felt, then Save. The Nights tab shows the calendar, the Patterns tab shows statistics once a few nights are logged.
+- "I can't sleep" appears on the Home tab in the night ambiance (after 7:30 pm, or set Settings > Ambiance > Night). It opens a very dark screen with a breathing glow and no clock.
+- Settings > Your data: PDF / CSV / JSON export through the system share sheet, backup restore, and delete everything.
+- The app makes no network requests and contains no analytics, crash reporting, ads or third-party SDKs that collect data. Notifications are local only (optional morning reminder).
+- The app does not use HealthKit.
+- Lueur is not a medical device. It does not diagnose or treat anything; durations are estimated from what the user enters. This is stated in the app (Settings > About) and in the description.
+- The interface follows the device language (French or English).

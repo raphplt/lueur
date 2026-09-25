@@ -55,7 +55,7 @@ export function demoData(today: DateKey, zone: Zone, days = 60, seed = 7): Expor
     const w = weekdayOf(date);
     const weekend = w === 0 || w === 6;
     const beforeNet = date < net.date;
-    const noise = rnd() < (beforeNet ? 0.35 : 0.1);
+    const noise = rnd() < (beforeNet ? 0.35 : 0.05);
     const insect = beforeNet && rnd() < 0.3;
     const thoughts = rnd() < 0.25;
     const screen = rnd() < 0.3;
@@ -63,7 +63,8 @@ export function demoData(today: DateKey, zone: Zone, days = 60, seed = 7): Expor
     const drift = ((days - i) / 7) * 10;
     const bed = round5(-60 + drift + (weekend ? 70 : 0) + (rnd() - 0.5) * 50 + (screen ? 20 : 0));
     const latency = round5(10 + rnd() * 15 + (thoughts ? 25 : 0) + (noise ? 10 : 0));
-    const rise = round5((weekend ? 540 : 420) + (rnd() - 0.5) * 30);
+    // Wake-up follows the drift in part, so nights shift rather than shrink.
+    const rise = round5((weekend ? 540 : 420) + drift + (rnd() - 0.5) * 30);
     const awakenings: NightDraft['awakenings'] = [];
     const count = (noise ? 2 : 0) + (insect ? 1 : 0) + (rnd() < 0.3 ? 1 : 0);
     for (let k = 0; k < count; k++) {

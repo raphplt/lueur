@@ -1,0 +1,1 @@
+Première version de Lueur. Un agenda du sommeil local et sans compte : saisie du matin sur la bande de la nuit, calendrier des nuits, tendances, journal de l’environnement, mode « Je n’arrive pas à dormir », rappels locaux, export PDF pour votre médecin, exports JSON et CSV.

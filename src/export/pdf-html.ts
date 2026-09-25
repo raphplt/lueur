@@ -110,7 +110,7 @@ export function buildPdfHtml(input: PdfInput): string {
     .join('\n');
 
   const summaryItems: [string, string][] = [
-    [t('common.nightsLogged', { count: s.nights }), `${s.nights} / ${dates.length}`],
+    [t('pdf.logged'), `${s.nights} / ${dates.length}`],
     [
       t('reports.frequency.title'),
       t('reports.frequency.value', { difficult: s.difficult, logged: s.nights }),

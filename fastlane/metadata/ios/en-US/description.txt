@@ -1,0 +1,36 @@
+Lueur is a sleep diary. Each morning, a few seconds to note your night. Over time, the difficult nights become visible: how many, when, and what tends to come with them.
+
+Everything stays on your phone. No account, no server, no ads, no usage statistics.
+
+LOG YOUR NIGHT IN A FEW SECONDS
+You log directly on the night band: drag bedtime, falling asleep, waking and getting up. Tap the band to add an awakening. Pick how the night felt, tick what may have played a part (noise, heat, thoughts, late screen…), and it is saved. Times are pre-filled: about 15 seconds.
+
+SEE YOUR NIGHTS AT A GLANCE
+The calendar weaves your nights one under the other, on a shared axis from 6 pm to 2 pm. Shifts, awakenings and pale nights show up without counting.
+
+PATTERNS, NOT SCORES
+• How many difficult nights in the last 30 days, compared with the month before
+• Estimated sleep, time in bed, time to fall asleep, awakenings, regularity
+• What comes with your nights: the markers linked to shorter or more difficult nights. A link seen in your nights, not necessarily a cause.
+• A bedtime that slowly drifts later, spotted week after week
+• The gap between weeknights and weekend nights
+• The environment journal: note a change (mosquito net, fan, earplugs…) and compare the two weeks before and after
+
+No streak to keep, no badges. A forgotten night is not a failure.
+
+WHEN SLEEP DOESN’T COME
+The “I can’t sleep” mode shows a very dark screen, with no clock. A slow, breathing glow keeps pace with your breath. After about twenty minutes, Lueur suggests getting up for a while and coming back when you feel sleepy: the so-called 20-minute rule. The awakening is added to your night.
+
+FOR YOUR DOCTOR
+Export a sleep diary as a PDF that a health professional can read, over the period you choose. JSON and CSV exports, backup restore, and deleting all your data at any time.
+
+QUIET BY DESIGN
+• One local morning reminder, if you want it. No follow-ups, and nothing shows if the night is already logged.
+• A light look in the morning and a dark one in the evening, following the time of day.
+• In English and French.
+
+PRIVACY
+Lueur collects no data. Nothing leaves your phone. On Android, the app doesn’t even have permission to access the Internet. Lueur is free, with no in-app purchases, and open source under the MIT licence: the source code is public.
+
+NOT A MEDICAL DEVICE
+Lueur is inspired by the sleep diary used in cognitive behavioural therapy for insomnia (CBT-I). It is not a therapy. Lueur does not diagnose anything and does not replace advice from a health professional. Durations are estimated from what you log, not measured. If difficult nights have been going on for several weeks, talking to a doctor can help.

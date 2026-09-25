@@ -411,6 +411,7 @@ const fr = {
     disclaimer:
       'Données déclarées par la personne chaque matin. Durées estimées, non mesurées. Ce document n’est pas un diagnostic.',
     summary: 'Synthèse',
+    logged: 'Nuits notées',
     columns: {
       night: 'Nuit',
       bed: 'Coucher',

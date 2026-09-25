@@ -1,0 +1,36 @@
+Lueur est un agenda du sommeil. Chaque matin, quelques secondes pour noter votre nuit. Avec le temps, les nuits difficiles deviennent visibles : combien, quand, et ce qui les accompagne.
+
+Tout reste sur votre téléphone. Pas de compte, pas de serveur, pas de publicité, pas de statistiques d’usage.
+
+NOTER SA NUIT EN QUELQUES SECONDES
+La saisie se fait sur la bande de la nuit elle-même : glissez le coucher, l’endormissement, le réveil et le lever. Touchez la bande pour ajouter un réveil. Choisissez un ressenti, cochez ce qui a pu jouer (bruit, chaleur, pensées, écran tard…), et c’est enregistré. Les horaires sont préremplis : environ 15 secondes.
+
+VOIR SES NUITS D’UN COUP D’ŒIL
+Le calendrier tisse vos nuits les unes sous les autres, sur un même axe de 18 h à 14 h. Les décalages, les réveils et les nuits pâles se lisent sans avoir à compter.
+
+DES TENDANCES, SANS NOTE NI SCORE
+• Le nombre de nuits difficiles sur les 30 derniers jours, comparé au mois précédent
+• Sommeil estimé, temps au lit, endormissement, réveils, régularité des horaires
+• Ce qui accompagne vos nuits : les repères associés à des nuits plus courtes ou plus difficiles. Un lien observé, pas forcément une cause.
+• Une heure de coucher qui recule lentement, repérée semaine après semaine
+• L’écart entre les nuits de semaine et celles du week-end
+• Le journal de l’environnement : notez un changement (moustiquaire, ventilateur, bouchons d’oreilles…) et comparez les deux semaines avant et après
+
+Pas de série à tenir, pas de badge. Une nuit oubliée n’est pas un échec.
+
+QUAND LE SOMMEIL NE VIENT PAS
+Le mode « Je n’arrive pas à dormir » affiche un écran très sombre, sans heure. Une lueur respire lentement pour accompagner votre respiration. Au bout d’une vingtaine de minutes, Lueur propose de se lever un moment, puis de revenir quand le sommeil se fait sentir : c’est la règle dite des 20 minutes. Le réveil est noté pour votre nuit.
+
+POUR EN PARLER À UN MÉDECIN
+Exportez un agenda du sommeil en PDF, lisible par un·e professionnel·le de santé, sur la période de votre choix. Exports JSON et CSV, restauration d’une sauvegarde, et suppression de toutes les données à tout moment.
+
+DISCRET
+• Un rappel local le matin, si vous le souhaitez. Pas de relance, et rien ne s’affiche si la nuit est déjà notée.
+• Une ambiance claire le matin et sombre le soir, qui suit l’heure.
+• En français et en anglais.
+
+CONFIDENTIALITÉ
+Lueur ne collecte aucune donnée. Rien ne quitte votre téléphone. Sur Android, l’application n’a même pas la permission d’accéder à Internet. Lueur est gratuit, sans achat intégré, et libre sous licence MIT : le code source est public.
+
+PAS UN DISPOSITIF MÉDICAL
+Lueur s’inspire de l’agenda du sommeil utilisé en thérapie comportementale et cognitive de l’insomnie (TCC-I). Ce n’est pas une thérapie. Lueur ne pose pas de diagnostic et ne remplace pas l’avis d’un·e professionnel·le de santé. Les durées sont estimées à partir de ce que vous notez, pas mesurées. Si vos nuits difficiles durent depuis plusieurs semaines, en parler à un médecin peut aider.

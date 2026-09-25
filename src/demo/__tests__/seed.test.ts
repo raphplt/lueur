@@ -24,5 +24,6 @@ describe('demo data', () => {
     expect(corr[0]?.sleepDeltaMin).toBeLessThan(0);
     const env = environmentComparison(data.nights, data.environmentChanges[0]!);
     expect(env.ready).toBe(true);
+    expect(env.sleepDeltaMin).toBeGreaterThan(0);
   });
 });

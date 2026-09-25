@@ -408,6 +408,7 @@ const en: Strings = {
     disclaimer:
       'Self-reported each morning. Durations are estimates, not measurements. This document is not a diagnosis.',
     summary: 'Summary',
+    logged: 'Nights logged',
     columns: {
       night: 'Night',
       bed: 'Bed',

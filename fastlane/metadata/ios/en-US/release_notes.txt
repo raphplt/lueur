@@ -1,0 +1,1 @@
+First release of Lueur. A local sleep diary with no account: morning entry on the night band, calendar of nights, patterns, environment journal, “I can’t sleep” mode, local reminders, PDF export for your doctor, JSON and CSV exports.

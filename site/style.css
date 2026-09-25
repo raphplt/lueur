@@ -1,0 +1,459 @@
+/*
+ * Lueur — site statique.
+ * Suit docs/DESIGN.md : ambiance Aube par défaut, Encre en mode sombre.
+ * Aucune ressource externe : polices servies depuis ./fonts (SIL OFL 1.1).
+ */
+
+@font-face {
+  font-family: "Young Serif";
+  src: url("fonts/YoungSerif-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ysabeau Office";
+  src: url("fonts/YsabeauOffice-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ysabeau Office";
+  src: url("fonts/YsabeauOffice-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tokens — Aube */
+:root {
+  color-scheme: light dark;
+
+  --bg: #EFE8DC;
+  --bg-raised: #F6F1E8;
+  --bg-sunken: #E5DCCD;
+  --line: #D6CAB7;
+  --text: #1C1A1F;
+  --text-muted: #5F5967;
+  --text-faint: #7A7482;
+  --light: #B37656;
+  --light-text: #8F5236;
+  --glow: 232 183 122; /* #E8B77A */
+  --glow-strength: 0.55;
+  --ambient-strength: 0.10;
+  --grain-opacity: 0.05;
+
+  --serif: "Young Serif", Georgia, "Times New Roman", serif;
+  --sans: "Ysabeau Office", "Segoe UI", system-ui, sans-serif;
+
+  --measure: 65ch;
+  --gutter: 24px;
+}
+
+/* Tokens — Encre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1C1A1F;
+    --bg-raised: #29252B;
+    --bg-sunken: #141216;
+    --line: #3A343C;
+    --text: #EFE8DC;
+    --text-muted: #B3ABB5;
+    --text-faint: #8C8794;
+    --light: #E8B77A;
+    --light-text: #E8B77A;
+    --glow-strength: 0.75;
+    --ambient-strength: 0.14;
+    --grain-opacity: 0.07;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  /* Lueur d'ambiance : halo ambre très étendu en haut de page. */
+  background-image: radial-gradient(
+    ellipse 90% 55% at 60% -8%,
+    rgb(var(--glow) / var(--ambient-strength)),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 1.0625rem; /* 17 */
+  line-height: 1.5;     /* ~25 */
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+/* Grain : bruit fractal statique, très discret. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: calc(var(--measure) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* En-tête */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  font-size: 0.875rem;
+}
+
+.top .home {
+  font-family: var(--serif);
+  font-size: 1.3125rem;
+  color: var(--text);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.lang {
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 12px 0 12px 12px; /* zone tactile */
+}
+
+.lang:hover,
+.lang:focus-visible {
+  color: var(--light-text);
+}
+
+/* Héros */
+.hero {
+  padding: 56px 0 40px;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(4rem, 19vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.pitch {
+  margin: 20px 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.3125rem, 4.6vw, 1.75rem);
+  line-height: 1.25;
+  color: var(--text-muted);
+  max-width: 22ch;
+}
+
+/*
+ * Signature : l'horizon. Un filet fin, un point chaud posé juste au-dessus,
+ * une lueur radiale douce (d'après assets/brand/mark-*.svg).
+ */
+.horizon {
+  position: relative;
+  height: 120px;
+  margin: 16px 0 0;
+  /* lueur radiale douce autour du point */
+  background: radial-gradient(
+    circle at 60% 71px,
+    rgb(var(--glow) / calc(var(--glow-strength) * 0.75)) 0,
+    rgb(var(--glow) / calc(var(--glow-strength) * 0.22)) 34px,
+    rgb(var(--glow) / 0) 96px
+  );
+}
+
+.horizon::before {
+  /* le filet */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 83px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--text) 10%,
+    var(--text) 90%,
+    transparent
+  );
+  opacity: 0.85;
+}
+
+.horizon::after {
+  /* le point de lumière */
+  content: "";
+  position: absolute;
+  left: 60%;
+  top: 64px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--light);
+  box-shadow: 0 0 16px 4px rgb(var(--glow) / calc(var(--glow-strength) * 0.7));
+}
+
+/* Sections */
+main section {
+  padding: 32px 0;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.3125rem; /* 21 */
+  line-height: 1.33;
+  color: var(--text);
+}
+
+h3 {
+  margin: 0 0 4px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.47;
+  color: var(--text);
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+a {
+  color: var(--light-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--light);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Points clés : liste sobre séparée par des filets */
+.points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.points li {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 0 12px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.points li::before {
+  /* petite lueur-repère, pas de puce générique */
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background: var(--light);
+  box-shadow: 0 0 10px 2px rgb(var(--glow) / calc(var(--glow-strength) * 0.5));
+}
+
+.points li > div > p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Encadré tonal (pas d'ombre, un ton et un filet) */
+.note {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 20px 24px;
+}
+
+.note h2 {
+  font-size: 1.125rem;
+  margin-bottom: 8px;
+}
+
+.note p:last-child {
+  margin-bottom: 0;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* Liens de téléchargement (texte, en attendant les badges) */
+.stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stores a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-raised);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stores a:hover,
+.stores a:focus-visible {
+  border-color: var(--light);
+}
+
+.soon {
+  margin: 12px 0 0;
+  font-size: 0.875rem;
+  color: var(--text-faint);
+}
+
+/* Politique de confidentialité */
+.doc-head {
+  padding: 40px 0 8px;
+}
+
+.doc-head h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.doc-head .date {
+  margin: 12px 0 0;
+  font-size: 0.875rem;
+  color: var(--text-faint);
+}
+
+.doc section {
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.doc section:first-of-type {
+  border-top: 0;
+}
+
+.doc ul {
+  margin: 0 0 16px;
+  padding-left: 1.2em;
+}
+
+.doc li {
+  margin-bottom: 6px;
+}
+
+.doc li::marker {
+  color: var(--light);
+}
+
+.doc .lede {
+  font-family: var(--serif);
+  font-size: 1.3125rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+/* Pied de page */
+footer {
+  margin-top: 40px;
+  padding: 24px 0 56px;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  color: var(--text-faint);
+}
+
+footer nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+footer nav a {
+  display: inline-block;
+  padding: 10px 0;
+  color: var(--text-muted);
+}
+
+footer p {
+  margin: 0 0 8px;
+}
+
+@media (min-width: 720px) {
+  .hero {
+    padding: 88px 0 48px;
+  }
+
+  .horizon {
+    margin-top: 24px;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  body::before,
+  .horizon,
+  .lang {
+    display: none;
+  }
+}

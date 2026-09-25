@@ -7,6 +7,7 @@
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.3",
     "expo": "~57.0.25",
+    "expo-asset": "~57.0.18",
     "expo-brightness": "~57.0.2",
     "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.19",

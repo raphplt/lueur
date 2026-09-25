@@ -54,3 +54,7 @@ fastlane/*.dSYM.zip
 *.apk
 e2e/screenshots/raw/
 build/
+
+# brand generation cache
+assets/brand/generated/.fontcache/
+assets/brand/generated/.fonts.conf

@@ -1,4 +1,4 @@
 {
-  "CFBundleDisplayName": "Lueur",
-  "app_name": "Lueur"
+  "ios": { "CFBundleDisplayName": "Lueur" },
+  "android": { "app_name": "Lueur" }
 }

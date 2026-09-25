@@ -87,6 +87,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     en: './assets/locales/en.json',
   },
   plugins: [
+    // Registered first so its mod runs last (after expo-notifications).
+    './plugins/with-ios-local-notifications-only',
     'expo-router',
     [
       'expo-font',
@@ -114,7 +116,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       { icon: './assets/brand/generated/notification-icon.png', color: '#B37656' },
     ],
     'expo-sqlite',
-    'expo-localization',
+    ['expo-localization', { supportedLocales: { ios: ['fr', 'en'], android: ['fr', 'en'] } }],
     'expo-sharing',
     [
       'expo-build-properties',

@@ -10,7 +10,11 @@
  *    builds still need it to reach the Metro bundler.
  * 3. Ships the ABIs real devices use (no 32-bit x86): smaller AAB, faster builds.
  */
-const { withAppBuildGradle, withDangerousMod, withGradleProperties } = require('expo/config-plugins');
+const {
+  withAppBuildGradle,
+  withDangerousMod,
+  withGradleProperties,
+} = require('expo/config-plugins');
 const fs = require('node:fs');
 const path = require('node:path');
 

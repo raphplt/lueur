@@ -67,7 +67,7 @@ platform :android do
     keys.to_h { |k| [k, k == 'LUEUR_UPLOAD_STORE_FILE' ? File.expand_path(ENV[k]) : ENV[k]] }
   end
 
-  desc 'Prebuild and build a signed release AAB (build/android/lueur-<version>.aab)'
+  desc 'Prebuild and build a signed release AAB and APK (build/android/lueur-<version>.{aab,apk})'
   lane :build do
     prebuild('android', next_version_code)
     gradle(
@@ -81,6 +81,18 @@ platform :android do
     FileUtils.mkdir_p(File.join(BUILD_DIR, 'android'))
     target = File.join(BUILD_DIR, 'android', "lueur-#{ENV['LUEUR_BUILD_NUMBER']}.aab")
     FileUtils.cp(aab, target)
+    # Installable APK too (sideloading, testing without a store).
+    gradle(
+      project_dir: File.join(ROOT, 'android'),
+      task: 'assemble',
+      build_type: 'Release',
+      properties: signing_properties,
+      print_command: false,
+    )
+    FileUtils.cp(
+      lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
+      File.join(BUILD_DIR, 'android', "lueur-#{ENV['LUEUR_BUILD_NUMBER']}.apk"),
+    )
     verify_no_internet_permission
     UI.success("AAB ready: #{target}")
     target

@@ -61,5 +61,7 @@ jobs:
         if: always()
         with:
           name: lueur-android-${{ github.run_number }}
-          path: build/android/*.aab
+          path: |
+            build/android/*.aab
+            build/android/*.apk
           if-no-files-found: ignore

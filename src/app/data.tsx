@@ -137,6 +137,8 @@ export default function Data() {
               if (!pending) return;
               replaceAll(pending);
               loadSettings();
+              // A restored diary never sends the user back to the questionnaire.
+              useSettings.getState().update({ onboarded: true });
               toast(
                 t('data.imported', {
                   nights: t('common.nights', { count: pending.nights.length }),
